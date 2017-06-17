@@ -33,7 +33,7 @@ function loadStdlib() {
   });
 };
 
-function compile(str, imports = { log: console.log }, sync) {
+export default function compile(str, imports = { log: console.log }, sync) {
   // reset
   compiler.reset(imports);
 
@@ -71,6 +71,4 @@ function compile(str, imports = { log: console.log }, sync) {
     });
   });
 };
-
-module.exports = compile;
 
