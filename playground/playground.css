@@ -1,0 +1,171 @@
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+}
+
+@media screen and (max-width: 800px) {
+  html,
+  body {
+    height: 100%;
+    overflow: visible;
+  }
+}
+
+/*Navigation bar*/
+
+.nav-bar {
+  background: #2C3E50;
+  border-bottom: 1px solid rgb(228, 228, 228);
+  height: 10%;
+  text-align: center;
+}
+
+.nav-bar .title {
+  display: inline-block;
+  margin-top: 10px;
+  height: 40px;
+  padding: 5px;
+  box-sizing: border-box;
+  cursor: default;
+  border: 1px solid rgb(211, 209, 209);
+}
+
+.nav-bar .title span {
+  font-weight: normal;
+  display: inline-block;
+  color: rgb(203, 203, 203);
+  font-size: 130%;
+  text-align: center;
+  font-family: Questrial, sans-serif;
+  cursor: default;
+  outline: 0px;
+  line-height: 30px;
+}
+
+/*Main*/
+
+.main-content {
+  padding-top: 0px;
+  height: 90%;
+}
+
+/*Editor*/
+
+#editor-section {
+  padding-left: 0px;
+  padding-right: 0px;
+  height: 100%;
+  min-height: 100%;
+}
+
+#editor-header {
+  background-color: rgb(245, 245, 245);
+  height: 40px;
+  padding: 5px;
+  border-bottom: 1px solid rgb(228, 228, 228);
+  text-align: center;
+}
+
+#editor-header a {
+  height: 30px;
+  width: 90px;
+  border: 1px solid rgb(236, 236, 236);
+  outline: 0px;
+  background-color: rgb(121, 152, 166);
+  font-size: 13px;
+  color: white;
+  cursor: pointer;
+  font-family: Questrial, sans-serif;
+  transition: all 0.2s ease-out;
+  text-decoration: none;
+  position: absolute;
+  box-sizing: border-box;
+  padding: 7px;
+  text-shadow: none;
+}
+
+#editor-header a:hover {
+  background-color: rgb(94, 127, 142);
+}
+
+/*Compiler results*/
+
+#clear_section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  height: 50px;
+}
+
+#clear_btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+  height: 29px;
+  width: 118px;
+  font-size: 15px;
+  font-family: Questrial;
+  color: rgb(118, 119, 119);
+  border: 1px solid rgb(118, 119, 119);
+  outline: 0px;
+  background-color: transparent;
+  cursor: pointer;
+  margin-left: 0px;
+  line-height: 10px;
+  z-index: 10;
+}
+
+#clear_btn:hover {
+  color: #1d2529;
+  border: 1px solid rgb(255, 255, 255);
+  background-color: rgb(255, 255, 255);
+}
+
+#compiler-section {
+  background: rgb(14, 22, 40);
+  height: 100%;
+  border-left: 3px solid rgb(228, 228, 228);
+  z-index: 5;
+}
+
+#bytecode-section {
+  height: 45%;
+}
+
+#exec-result {
+  height: 45%;
+  border-top: 3px solid rgb(228, 228, 228);
+}
+
+.prompt {
+  padding: 10px;
+  font-family: Inconsolata;
+  height: 100%;
+}
+
+.prompt h5 {
+  color: rebeccapurple;
+}
+
+.prompt .arrow {
+  color: yellow;
+  float: left;
+}
+
+.prompt .txt {
+  color: white;
+  word-wrap: break-word;
+  height: 70%;
+  width: 90%;
+  overflow-y: auto;
+}
+
+/*Codemirror*/
+
+.CodeMirror-vscrollbar {
+  overflow: hidden;
+  display: none;
+}
