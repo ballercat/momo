@@ -1,8 +1,4 @@
-import test from 'ava';
-
-test.todo('if');
-
-const tests = [
+module.exports = [
   ` int main() {
     int a = 5;
     if (a == 5) {
@@ -31,7 +27,7 @@ const tests = [
         b = 25;
       }
       else if (a == 10) {
-        b = 42;
+        b = 42;  
       }
       else {
         b = a * 2;
@@ -42,4 +38,3 @@ const tests = [
   };`,
   `198`
 ];
-

@@ -1,6 +1,4 @@
-import test from 'ava';
-
-test.todo('post-pre', [
+module.exports = [
   `int main() {
     int a = -10;
     return (-(++a + -30 - -10) * -8);
@@ -17,7 +15,7 @@ test.todo('post-pre', [
     int i = 0;
     int a = 5;
     while (i++ < 100) {
-      a = a + 1;
+      a = a + 1;  
     };
     return (i);
   };
@@ -27,7 +25,7 @@ test.todo('post-pre', [
     int i = 0;
     int a = 5;
     while (++i < 100) {
-      a = a + 1;
+      a = a + 1;  
     };
     return (i);
   };`,
@@ -46,7 +44,7 @@ test.todo('post-pre', [
     int i = 100;
     int a = 5;
     while (i-- > 0) {
-      a = a + 1;
+      a = a + 1;  
     };
     return (i);
   };`,
@@ -55,7 +53,7 @@ test.todo('post-pre', [
     int i = 100;
     int a = 5;
     while (--i > 0) {
-      a = a + 1;
+      a = a + 1;  
     };
     return (a);
   };`,
@@ -80,6 +78,51 @@ test.todo('post-pre', [
     int k = i++;
     return (k);
   };`,
-  `1`
-]);
-
+  `1`,
+  `void test(int *h) {
+    *h = 124;
+    *h += 1;
+    ++(*h);
+  };
+  int main() {
+    int g = 123;
+    test(&g);
+    return (g == 126);
+  };`,
+  `1`,
+  `void test(int *h) {
+    *h = 124;
+    *h += 1;
+    (*h)++;
+  };
+  int main() {
+    int g = 123;
+    test(&g);
+    return (g == 126);
+  };`,
+  `1`,
+  `int test(int h) {
+    h += 1;
+    h++;
+    ++h;
+    return (h++);
+  };
+  int main() {
+    int g = 123;
+    return (test(g));
+  };
+  `,
+  `126`,
+  `int test(int h) {
+    h += 1;
+    h++;
+    ++h;
+    return (++h);
+  };
+  int main() {
+    int g = 123;
+    return (test(g));
+  };
+  `,
+  `127`
+];

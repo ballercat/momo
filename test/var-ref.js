@@ -1,6 +1,4 @@
-import test from 'ava';
-
-test.todo('var-ref', [
+module.exports = [
   `int main() {
     int  a = 300;
     int  b = 400;
@@ -52,5 +50,4 @@ test.todo('var-ref', [
   };
   `,
   `1`
-]);
-
+];

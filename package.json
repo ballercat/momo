@@ -9,7 +9,7 @@
   "scripts": {
     "test": "npm run build && npm run ava",
     "ava": "ava || true",
-    "build": "echo \"Building...\" && rollup -c && NODE_ENV=production rollup -c"
+    "build": "echo \"Building...\" && rollup -c"
   },
   "repository": {
     "type": "git",
@@ -27,7 +27,6 @@
   },
   "homepage": "https://github.com/ballercat/momo#readme",
   "devDependencies": {
-    "ansi-codes": "0.0.1-security",
     "ava": "^0.19.1",
     "babel-plugin-external-helpers": "^6.22.0",
     "babel-preset-env": "^1.5.2",
@@ -41,7 +40,7 @@
   },
   "ava": {
     "files": [
-      "test/*.js",
+      "spec/*.js",
       "!**/utils.js"
     ],
     "source": [
@@ -53,7 +52,6 @@
     "failWithoutAssertions": false,
     "tap": false,
     "powerAssert": false,
-    "sourceMap": "inline",
     "require": [
       "babel-register"
     ],

@@ -1,6 +1,4 @@
-import test from 'ava';
-
-test.todo('pointer', [
+module.exports = [
   `int swap(int *c, int *d) {
     int tmp = *c;
     *c = *d;
@@ -235,7 +233,26 @@ test.todo('pointer', [
     int *ptr = &a;
     return (*&ptr == &*ptr);
   };`,
+  `1`,
+  // FIX pointer address incr/decr
+  `int main() {
+    int a = 1;
+    int b = 2;
+    int *ptr = &b;
+    ptr++;
+    ++ptr;
+    *ptr++;
+    *(ptr)++;
+    *++ptr;
+    *(++ptr);
+    int c = 3;
+    int d = 4;
+    int e = 5;
+    int f = 6;
+    int g = 7;
+    int h = 8;
+    int i = 9;
+    return (ptr);
+  };`,
   `1`
-]);
-
-
+];

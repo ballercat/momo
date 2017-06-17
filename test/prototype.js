@@ -1,6 +1,4 @@
-import test from 'ava';
-
-test.todo('prototype', [
+module.exports = [
  `int fact();
   int lol(int a, int b);
   extern int main() {
@@ -15,5 +13,4 @@ test.todo('prototype', [
   };
   `,
   `14`
-]);
-
+];

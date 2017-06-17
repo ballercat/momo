@@ -130,7 +130,7 @@
 
     ////////// Stylistic Issues //////////
 
-    "brace-style": 1,               // enforce one true brace style (off by default)
+    "brace-style": 0,               // enforce one true brace style (off by default)
     "camelcase": 1,                 // require camel case names
     "comma-spacing": 1,             // enforce spacing before and after comma
     "comma-style": 1,               // enforce one true comma style (off by default)
@@ -143,7 +143,7 @@
     "new-cap": 1,                   // require a capital letter for constructors
     "new-parens": 1,                // disallow the omission of parentheses when invoking a constructor with no arguments
     "no-array-constructor": 1,      // disallow use of the Array constructor
-    "no-inline-comments": 1,        // disallow comments inline after code (off by default)
+    "no-inline-comments": 0,        // disallow comments inline after code (off by default)
     "no-lonely-if": 0,              // disallow if as the only statement in an else block (off by default)
     "no-mixed-spaces-and-tabs": 0,  // disallow mixed spaces and tabs for indentation
     "no-multiple-empty-lines": 0,   // disallow multiple empty lines (off by default)

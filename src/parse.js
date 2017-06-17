@@ -1,6 +1,7 @@
 "use strict";
-import { Token, Nodes, TokenList, Operators } from './const';
+import { Token, Nodes, TokenList, Operators, getLabelName } from './const';
 import { pushScope, popScope, expectScope, lookupFunctionScope } from './scope';
+import { evalExpression } from './eval';
 import compiler from './compiler';
 
 function isBinaryOperator(token) {
@@ -16,6 +17,9 @@ function isBinaryOperator(token) {
     kind === Operators.AND ||
     kind === Operators.BIN_AND ||
     kind === Operators.BIN_OR ||
+    kind === Operators.BIN_XOR ||
+    kind === Operators.BIN_SHL ||
+    kind === Operators.BIN_SHR ||
     kind === Operators.NOT ||
     kind === Operators.LT ||
     kind === Operators.LE ||
@@ -27,7 +31,12 @@ function isBinaryOperator(token) {
     kind === Operators.SUB_ASS ||
     kind === Operators.MUL_ASS ||
     kind === Operators.DIV_ASS ||
-    kind === Operators.MOD_ASS) &&
+    kind === Operators.MOD_ASS ||
+    kind === Operators.BIN_AND_ASS ||
+    kind === Operators.BIN_OR_ASS ||
+    kind === Operators.BIN_XOR_ASS ||
+    kind === Operators.BIN_SHL_ASS ||
+    kind === Operators.BIN_SHR_ASS) &&
     (kind !== Operators.NOT &&
     kind !== Operators.INCR &&
     kind !== Operators.DECR)
@@ -41,7 +50,12 @@ function isAssignmentOperator(kind) {
     kind === Operators.SUB_ASS ||
     kind === Operators.MUL_ASS ||
     kind === Operators.DIV_ASS ||
-    kind === Operators.MOD_ASS
+    kind === Operators.MOD_ASS ||
+    kind === Operators.BIN_AND_ASS ||
+    kind === Operators.BIN_OR_ASS ||
+    kind === Operators.BIN_XOR_ASS ||
+    kind === Operators.BIN_SHL_ASS ||
+    kind === Operators.BIN_SHR_ASS
   );
 };
 
@@ -50,6 +64,7 @@ function isUnaryPrefixOperator(token) {
   return (
     kind === Operators.BIN_AND ||
     kind === Operators.MUL ||
+    kind === Operators.BIN_NOT ||
     kind === Operators.SUB ||
     kind === Operators.ADD ||
     kind === Operators.NOT ||
@@ -113,7 +128,7 @@ function next() {
 function expect(kind) {
   const { current, __imports } = compiler;
   if (current.kind !== kind) {
-    __imports.error("Expected " + kind + " but got " + current.kind + " in " + current.line + ":" + current.column);
+    __imports.error("Expected " + getLabelName(kind) + " but got " + getLabelName(current.kind) + " in " + current.line + ":" + current.column);
   } else {
     next();
   }
@@ -122,7 +137,7 @@ function expect(kind) {
 function expectIdentifier() {
   const { current, __imports } = compiler;
   if (current.kind !== Token.IDENTIFIER) {
-    __imports.error("Expected " + Token.IDENTIFIER + ":identifier but got " + current.kind + ":" + current.value);
+    __imports.error("Expected " + Token.IDENTIFIER + ":identifier but got " + getLabelName(current.kind) + ":" + current.value);
   }
 };
 
@@ -155,6 +170,8 @@ function parseStatement() {
   let node = null;
   if (eat(TokenList.EXPORT)) {
     node = parseDeclaration(true);
+  } else if (peek(TokenList.ENUM)) {
+    node = parseEnumDeclaration();
   } else if (isNativeType(current)) {
     node = parseDeclaration(false);
   } else if (peek(TokenList.RETURN)) {
@@ -170,6 +187,46 @@ function parseStatement() {
     }
   }
   eat(TokenList.SEMICOLON);
+  return (node);
+};
+
+function parseEnumDeclaration() {
+  expect(TokenList.ENUM);
+  let node = {
+    kind: Nodes.EnumDeclaration,
+    name: null,
+    items: []
+  };
+  if (peek(Token.Identifier)) {
+    node.name = compiler.current.value;
+    next();
+  }
+  expect(TokenList.LBRACE);
+  let iter = 0;
+  while (true) {
+    expectIdentifier();
+    let emura = {
+      kind: Nodes.Enumerator,
+      name: compiler.current.value,
+      init: null
+    };
+    next();
+    if (eat(Operators.ASS)) {
+      let expr = parseExpression(Operators.LOWEST);
+      emura.init = expr;
+      emura.resolvedValue = evalExpression(expr);
+      iter = emura.resolvedValue;
+    } else {
+      emura.resolvedValue = iter;
+    }
+    node.items.push(emura);
+    compiler.scope.register(emura.name, emura);
+    // allow trailing commas
+    eat(TokenList.COMMA);
+    if (peek(TokenList.RBRACE)) break;
+    iter++;
+  };
+  expect(TokenList.RBRACE);
   return (node);
 };
 
@@ -264,8 +321,11 @@ function parseReturnStatement() {
   expect(TokenList.RETURN);
   let node = {
     kind: Nodes.ReturnStatement,
-    argument: parseExpression(Operators.LOWEST)
+    argument: null
   };
+  if (!peek(TokenList.SEMICOLON)) {
+    node.argument = parseExpression(Operators.LOWEST);
+  }
   expectScope(node, Nodes.FunctionDeclaration);
   let item = compiler.scope;
   while (item !== null) {
@@ -305,6 +365,28 @@ function parseFunctionDeclaration(type, name, extern) {
   }
   if (node.prototype !== null && node.type !== TokenList.VOID && !node.returns.length) {
     compiler.__imports.error("Missing return in function: " + node.id);
+  }
+  // auto insert a empty return for void functions
+  if (!node.returns.length && node.type === TokenList.VOID) {
+    let ret = {
+      kind: Nodes.ReturnStatement,
+      argument: null
+    };
+    node.returns.push(ret);
+    node.body.body.push(ret);
+  }
+  // auto insert return 0 for non-return main
+  if (node.id === "main" && !node.returns.length) {
+    let ret = {
+      kind: Nodes.ReturnStatement,
+      argument: {
+        kind: Nodes.Literal,
+        type: Token.NumericLiteral,
+        value: "0"
+      }
+    };
+    node.returns.push(ret);
+    node.body.body.push(ret);
   }
   return (node);
 };
@@ -390,6 +472,8 @@ function parseVariableDeclaration(type, name, extern, isPointer, isAlias) {
   if (!node.isGlobal) {
     let fn = lookupFunctionScope(compiler.scope).node;
     fn.locals.push(node);
+  } else {
+    node.resolvedValue = evalExpression(node.init.right);
   }
   return (node);
 };
@@ -445,23 +529,6 @@ function parseContinue() {
   };
   expect(TokenList.CONTINUE);
   expectScope(node, Nodes.WhileStatement);
-  return (node);
-};
-
-function isCastOperator(token) {
-  return (token.kind === Operators.CAST);
-};
-
-function parseCastExpression(left) {
-  let node = {
-    kind: Nodes.CastExpression,
-    source: left,
-    target: null
-  };
-  next();
-  expectTypeLiteral();
-  node.target = compiler.current;
-  next();
   return (node);
 };
 
@@ -527,7 +594,7 @@ function parseBinaryExpression(level, left) {
       operator: "=",
       right: {
         kind: Nodes.BinaryExpression,
-        operator: operator.charAt(0),
+        operator: operator.slice(0, operator.length - 1),
         left: node.left,
         right: node.right
       }
@@ -549,9 +616,6 @@ function parseInfix(level, left) {
   }
   if (peek(TokenList.LPAREN)) {
     return (parseCallExpression(left));
-  }
-  if (isCastOperator(compiler.current)) {
-    return (parseCastExpression(left));
   }
   return (left);
 };

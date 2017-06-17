@@ -55,9 +55,12 @@ function isOperatorChar(ch) {
     ch === "=" ||
     ch === "+" ||
     ch === "-" ||
+    ch === "%" ||
     ch === "!" ||
     ch === "|" ||
     ch === "&" ||
+    ch === "~" ||
+    ch === "^" ||
     ch === ">" ||
     ch === "<" ||
     ch === "*" ||
@@ -73,17 +76,24 @@ function isOperator(str) {
     str === "++" ||
     str === "--" ||
     str === "==" ||
+    str === ">=" ||
+    str === "<=" ||
     str === "!=" ||
     str === "||" ||
     str === "&&" ||
-    str === ">=" ||
-    str === "<=" ||
+    str === "<<" ||
+    str === ">>" ||
     str === "+=" ||
     str === "-=" ||
     str === "*=" ||
     str === "/=" ||
     str === "%=" ||
-    str === "=>"
+    str === "^=" ||
+    str === "&=" ||
+    str === "|=" ||
+    str === "^=" ||
+    str === "<<=" ||
+    str === ">>="
   );
 };
 
@@ -121,10 +131,18 @@ export default function scan(str) {
   };
 
   // placed here to have correct context to next()
-  function processOperator(ch, second, line, column) {
+  function processOperator(ch, idx, line, column) {
+    let second = str.slice(idx + 1, idx + 2);
+    let third = str.slice(idx + 2, idx + 3);
     if (second && isOperator(ch + second)) {
-      next();
-      processToken(tokens, ch + second, line, column);
+      if (third && isOperator(ch + second + third)) {
+        next();
+        next();
+        processToken(tokens, ch + second + third, line, column);
+      } else {
+        next();
+        processToken(tokens, ch + second, line, column);
+      }
     } else if (isOperator(ch)) {
       processToken(tokens, ch, line, column);
     }
@@ -216,8 +234,7 @@ export default function scan(str) {
     }
     // single operator [+,-,=]
     if (isOperatorChar(ch)) {
-      let second = str.slice(ii+1, ii+2);
-      processOperator(ch, second, line, column);
+      processOperator(ch, ii, line, column);
       continue;
     }
     if (ii >= length) {

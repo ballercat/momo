@@ -1,7 +1,4 @@
-import test from 'ava';
-import runTest from './utils';
-
-const tests = [
+module.exports = [
   `int add(int a, int b) {
     return (a + b);
   };
@@ -14,6 +11,7 @@ const tests = [
     return ((add == &add) && (add != sub) && sub > add);
   };
   `,
+  `1`,
   `int add(int a, int b) {
     return (a + b);
   };
@@ -21,18 +19,21 @@ const tests = [
     int *func1 = add;
     return (func1(6, 16));
   };`,
+  `22`,
   `int add(int a, int b) {
     return (a + b);
   };
    int main() {
     int *func1 = add;
     return (func1(6, 16) == add(6, 16));
-  };`
+  };`,
+  `1`,
+  `int add() {
+    return (42);
+  };
+  int main() {
+    int *func1 = add;
+    return (func1());
+  };`,
+  `42`
 ];
-
-const results = [1, 22, 1];
-
-test('function pointers', t => runTest(t, tests, results));
-
-export default tests;
-

@@ -1,6 +1,4 @@
-import test from 'ava';
-
-test.todo('while', [
+module.exports = [
   ` int main() {
     int a = 5;
     while (a < 100) {
@@ -44,6 +42,4 @@ test.todo('while', [
     return (c);
   };`,
   `42`
-]);
-
-
+];
