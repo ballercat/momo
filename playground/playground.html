@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Momo</title>
+
+    <!-- JQuery -->
+    <script
+      src="https://code.jquery.com/jquery-1.12.4.min.js"
+      integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ="
+      crossorigin="anonymous"></script>
+
+    <!-- Bootstrap -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
+    <!-- Codemirror -->
+    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.25.2/theme/mdn-like.min.css'/>
+    <link rel="stylesheet" href="http://esironal.github.io/cmtouch/lib/codemirror.css">
+    <script src="http://esironal.github.io/cmtouch/lib/codemirror.js"></script>
+    <script src="https://codemirror.net/mode/clike/clike.js"></script>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Questrial" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Inconsolata"
+              rel="stylesheet" type="text/css" />
+
+    <!-- Custom CSS -->
+    <link rel='stylesheet' href='playground.css' />
+
+    <!-- Compiler src -->
+    <script type="text/javascript" src="../src/const.js"></script>
+    <script type="text/javascript" src="../src/bytes.js"></script>
+    <script type="text/javascript" src="../src/scope.js"></script>
+    <script type="text/javascript" src="../src/scan.js"></script>
+    <script type="text/javascript" src="../src/parse.js"></script>
+    <script type="text/javascript" src="../src/emit.js"></script>
+    <script type="text/javascript" src="../src/index.js"></script>
+  </head>
+  <body>
+
+    <!-- Navbar -->
+    <div class="nav-bar">
+      <div class="title">
+        <span tabindex="0">Momo</span>
+      </div>
+    </div>
+
+    <!-- Main -->
+    <div class="main-content">
+
+      <!-- Editor -->
+      <div class="col-lg-7 col-md-7 col-sm-7" id="editor-section">
+        <div id="editor-header">
+          <a id="cmp">
+            Run <span class="glyphicon glyphicon-play" aria-hidden="true"></span>
+          </a>
+        </div>
+        <textarea id="code"></textarea>
+      </div>
+
+      <!-- Compilation section-->
+      <div class="col-lg-5 col-md-5 col-sm-5" id="compiler-section">
+
+        <!-- Clear button -->
+        <div class="row" style="height:10%">
+          <div id="clear_section">
+            <div id="clear_btn" title="Clear">
+              clear &nbsp;
+              <span class="glyphicon glyphicon-ban-circle"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Compiled code -->
+        <div class="row" id="bytecode-section">
+          <div class="prompt">
+            <h5>Compiled code</h5>
+            <span class="arrow">=> &nbsp;</span>
+            <div class="txt" id="buffer">0,61,73,6d,1,0,0,0,1,8f,80,80,80,0,82,80,80,80,0,60,2,7f,7f,1,7f,60,0,1,7f,3,87,80,80,80,0,82,80,80,80,0,0,1,4,89,80,80,80,0,81,80,80,80,0,70,1,2,2,5,83,80,80,80,0,1,0,1,6,85,80,80,80,0,80,80,80,80,0,7,95,80,80,80,0,82,80,80,80,0,4,6d,61,69,6e,0,1,6,6d,65,6d,6f,72,79,2,0,9,91,80,80,80,0,82,80,80,80,0,0,41,0,b,1,0,0,41,1,b,1,1,a,e7,80,80,80,0,82,80,80,80,0,a5,80,80,80,0,1,1,7f,41,0,20,0,28,2,0,36,2,0,20,0,20,1,28,2,0,36,2,0,20,1,41,0,28,2,0,36,2,0,41,0,f,b,b3,80,80,80,0,3,1,7f,1,7f,1,7f,41,4,41,a,36,2,0,41,8,41,14,36,2,0,41,c,41,8,36,2,0,41,8,41,21,36,2,0,41,4,41,8,10,0,41,4,28,2,0,41,2,6a,f,b
+            </div>
+          </div>
+        </div>
+
+        <!-- Execution result -->
+        <div class="row" id="exec-result">
+          <div class="prompt">
+            <h5>Execution result</h5>
+            <span class="arrow">=>&nbsp;</span>
+            <div class="txt">
+              <span id="output">35</span><br>
+              <span id="celapsed">Compiled in: 1.849999ms</span><br>
+              <span id="elapsed">Executed in: 0ms</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Custom Script -->
+    <script src="playground.js"></script>
+
+  </body>
+</html>
