@@ -23,5 +23,8 @@
   "bugs": {
     "url": "https://github.com/ballercat/momo/issues"
   },
-  "homepage": "https://github.com/ballercat/momo#readme"
+  "homepage": "https://github.com/ballercat/momo#readme",
+  "devDependencies": {
+    "ava": "^0.19.1"
+  }
 }
