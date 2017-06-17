@@ -1,0 +1,27 @@
+{
+  "name": "momo",
+  "version": "1.0.0",
+  "description": "Experimental C to WebAssembly compiler",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ballercat/momo.git"
+  },
+  "keywords": [
+    "wasm",
+    "c",
+    "compiler"
+  ],
+  "author": "Felix Maier",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ballercat/momo/issues"
+  },
+  "homepage": "https://github.com/ballercat/momo#readme"
+}
