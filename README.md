@@ -1,4 +1,4 @@
-# <img width="10%" src="http://i.imgur.com/mquA9Ww.png" /> mini-wasm 
+# <img width="10%" src="http://i.imgur.com/mquA9Ww.png" /> mini-wasm
 [Just let me play with it](http://maierfelix.github.io/momo/)
 
 ### Description:
@@ -36,6 +36,23 @@ compile(`
   };
 `, {}, false);
 ````
- 
+
+### Testing
+
+You can run the unit tests through [ava](https://github.com/avajs/ava). Just clone the repo and use pre-built npm commands
+```
+git clone https://github.com/maierfelix/momo.git
+cd momo
+npm install
+npm test
+```
+
+... or watch changes with `--watch`
+
+```
+npm test -- --watch
+```
+
 ### Contribution:
  - Feel free to send any kind of pull request
+
