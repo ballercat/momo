@@ -1,3 +1,7 @@
+import test from 'ava';
+
+test(t => {});
+
 module.exports = [
   `int main() {
     int a = -10;
@@ -15,7 +19,7 @@ module.exports = [
     int i = 0;
     int a = 5;
     while (i++ < 100) {
-      a = a + 1;  
+      a = a + 1;
     };
     return (i);
   };
@@ -25,7 +29,7 @@ module.exports = [
     int i = 0;
     int a = 5;
     while (++i < 100) {
-      a = a + 1;  
+      a = a + 1;
     };
     return (i);
   };`,
@@ -44,7 +48,7 @@ module.exports = [
     int i = 100;
     int a = 5;
     while (i-- > 0) {
-      a = a + 1;  
+      a = a + 1;
     };
     return (i);
   };`,
@@ -53,7 +57,7 @@ module.exports = [
     int i = 100;
     int a = 5;
     while (--i > 0) {
-      a = a + 1;  
+      a = a + 1;
     };
     return (a);
   };`,

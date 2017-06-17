@@ -1,3 +1,7 @@
+import test from 'ava';
+
+test('if', t => {});
+
 module.exports = [
   ` int main() {
     int a = 5;
@@ -27,7 +31,7 @@ module.exports = [
         b = 25;
       }
       else if (a == 10) {
-        b = 42;  
+        b = 42;
       }
       else {
         b = a * 2;

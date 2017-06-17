@@ -1,3 +1,7 @@
+import test from 'ava';
+
+test('function', t => {});
+
 module.exports = [
   `int fact(int n) {
     if (n == 0) {

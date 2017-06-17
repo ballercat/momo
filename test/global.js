@@ -1,3 +1,7 @@
+import test from 'ava';
+
+test('global', t => {});
+
 module.exports = [
   `
   int test = 4;

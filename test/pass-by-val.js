@@ -1,3 +1,7 @@
+import test from 'ava';
+
+test('pass-by-val', t => {});
+
 module.exports = [
   `int test(int h) {
     h++;

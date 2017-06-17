@@ -1,3 +1,7 @@
+import test from 'ava';
+
+test('indirect-call', t => {});
+
 module.exports = [
   `int add(int a, int b) {
     return (a + b);

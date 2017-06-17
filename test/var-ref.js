@@ -1,3 +1,7 @@
+import test from 'ava';
+
+test(t => {});
+
 module.exports = [
   `int main() {
     int  a = 300;

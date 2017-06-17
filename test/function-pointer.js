@@ -1,4 +1,6 @@
-module.exports = [
+import test from 'ava';
+
+const tests = [
   `int add(int a, int b) {
     return (a + b);
   };
@@ -29,3 +31,8 @@ module.exports = [
   };`,
   `1`
 ];
+
+test('function-pointer', t => {});
+
+export default tests;
+
