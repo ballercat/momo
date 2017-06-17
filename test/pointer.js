@@ -1,8 +1,5 @@
 import test from 'ava';
 
-test('pointer', t => {});
-
-
 const tests = [
   `int swap(int *c, int *d) {
     int tmp = *c;
@@ -240,3 +237,6 @@ const tests = [
   };`,
   `1`
 ];
+test('pointer', t => {});
+
+

@@ -1,7 +1,5 @@
 import test from 'ava';
 
-test(t => {});
-
 const tests = [
   `int main() {
     int  a = 300;
@@ -55,3 +53,5 @@ const tests = [
   `,
   `1`
 ];
+test(t => {});
+

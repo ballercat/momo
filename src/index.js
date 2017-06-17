@@ -1,13 +1,8 @@
 "use strict";
-
-// # compiler globals
-let bytes = null;
-let scope = null;
-let global = null;
-let pindex = 0;
-let tokens = null;
-let current = null;
-let __imports = null;
+import parse from './parse';
+import scan from './scan';
+import { emit } from './emit';
+import compiler from './compiler';
 
 function hexDump(array) {
   let result = Array.from(array).map((v) => {
@@ -40,17 +35,13 @@ function loadStdlib() {
 
 function compile(str, imports, sync) {
   // reset
-  pindex = 0;
-  scope = global = current = __imports = tokens = null;
-  bytes = new ByteArray();
-  __imports = imports;
-  currentHeapOffset = 0;
+  compiler.reset(imports);
 
   // process
   let tkns = scan(str);
   let ast = parse(tkns);
   emit(ast);
-  let buffer = new Uint8Array(bytes);
+  let buffer = new Uint8Array(compiler.bytes);
   let dump = hexDump(buffer);
 
   // output
@@ -81,9 +72,5 @@ function compile(str, imports, sync) {
   });
 };
 
-if (typeof module === "object" && module.exports) {
-  module.exports = compile;
-}
-else if (typeof window !== "undefined") {
-  window.compile = compile;
-}
+module.exports = compile;
+

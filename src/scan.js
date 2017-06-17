@@ -1,4 +1,5 @@
 "use strict";
+import { Token, TokenList, Operators } from '.const';
 
 function isBlank(cc) {
   return (
@@ -107,7 +108,7 @@ function createToken(kind, value, line, column) {
   return (token);
 };
 
-function scan(str) {
+export default function scan(str) {
   let ii = -1;
   let line = 1;
   let column = 0;

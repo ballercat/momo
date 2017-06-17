@@ -1,7 +1,5 @@
 import test from 'ava';
 
-test('function', t => {});
-
 const tests = [
   `int fact(int n) {
     if (n == 0) {
@@ -25,3 +23,6 @@ const tests = [
   `,
   `42`
 ];
+
+test(t => {});
+

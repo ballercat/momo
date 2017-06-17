@@ -1,6 +1,7 @@
 "use strict";
+import { WASM } from './const';
 
-class ByteArray extends Array {
+export default class ByteArray extends Array {
   emitU8(value) {
     this.push(value & 0xff);
   }
@@ -152,12 +153,13 @@ class ByteArray extends Array {
   }
   emitUi32(value) {
     value = value | 0;
-    this.emitU8(WASM_OPCODE_I32_CONST);
+    this.emitU8(WASM.OPCODE_I32_CONST);
     this.writeVarUnsigned(value);
   }
   emitLoad32() {
-    this.emitU8(WASM_OPCODE_I32_LOAD);
-    this.emitU8(2); // i32 alignment
+    this.emitU8(WASM.OPCODE_I32_LOAD);
+    // i32 alignment
+    this.emitU8(2);
     this.writeVarUnsigned(0);
   }
   emitString(str) {

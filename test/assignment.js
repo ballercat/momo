@@ -1,4 +1,5 @@
 import test from 'ava';
+import compile from '../dist/momo';
 
 const tests = [
   ` int main() {
@@ -41,7 +42,8 @@ const tests = [
   `168`
 ];
 
-test('assignment', t => {
+test(t => {
+  compile(tests[0]);
 });
 
 export default tests;

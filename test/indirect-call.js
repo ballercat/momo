@@ -1,7 +1,5 @@
 import test from 'ava';
 
-test('indirect-call', t => {});
-
 const tests = [
   `int add(int a, int b) {
     return (a + b);
@@ -18,3 +16,5 @@ const tests = [
   `,
   `8`
 ];
+test(t => {});
+

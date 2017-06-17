@@ -1,7 +1,5 @@
 import test from 'ava';
 
-test(t => {});
-
 const tests = [
  `int fact();
   int lol(int a, int b);
@@ -18,3 +16,5 @@ const tests = [
   `,
   `14`
 ];
+test(t => {});
+

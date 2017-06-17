@@ -1,4 +1,7 @@
 "use strict";
+import { Token, Nodes, TokenList, Operators } from './const';
+import { pushScope, popScope, expectScope, lookupFunctionScope } from './scope';
+import compiler from './compiler';
 
 function isBinaryOperator(token) {
   let kind = token.kind;
@@ -84,30 +87,31 @@ function isNativeType(token) {
 };
 
 // # Parser #
-function parse(tkns) {
-  tokens = tkns;
-  pindex = -1;
+export default function parse(tkns) {
+  compiler.tokens = tkns;
+  compiler.pindex = -1;
   next();
   let node = {
     kind: Nodes["Program"],
     body: null
   };
   pushScope(node);
-  global = scope;
+  compiler.global = compiler.scope;
   node.body = parseBlock();
   return (node);
 };
 
 function peek(kind) {
-  return (current && current.kind === kind);
+  return (compiler.current && compiler.current.kind === kind);
 };
 
 function next() {
-  pindex++;
-  current = tokens[pindex];
+  compiler.pindex++;
+  compiler.current = compiler.tokens[compiler.pindex];
 };
 
 function expect(kind) {
+  const { current, __imports } = compiler;
   if (current.kind !== kind) {
     __imports.error("Expected " + kind + " but got " + current.kind + " in " + current.line + ":" + current.column);
   } else {
@@ -116,6 +120,7 @@ function expect(kind) {
 };
 
 function expectIdentifier() {
+  const { current, __imports } = compiler;
   if (current.kind !== Token.IDENTIFIER) {
     __imports.error("Expected " + Token.IDENTIFIER + ":identifier but got " + current.kind + ":" + current.value);
   }
@@ -133,10 +138,10 @@ function parseBlock() {
   let node = {
     kind: Nodes.BlockStatement,
     body: [],
-    context: scope
+    context: compiler.scope
   };
   while (true) {
-    if (!current) break;
+    if (!compiler.current) break;
     if (peek(TokenList.RBRACE)) break;
     let child = parseStatement();
     if (child === null) break;
@@ -146,6 +151,7 @@ function parseBlock() {
 };
 
 function parseStatement() {
+  const { current, __imports } = compiler;
   let node = null;
   if (eat(TokenList.EXPORT)) {
     node = parseDeclaration(true);
@@ -170,25 +176,24 @@ function parseStatement() {
 function parseDeclaration(extern) {
   let node = null;
   expectTypeLiteral();
-  const type = current.kind;
+  const type = compiler.current.kind;
   next();
   let isPointer = eat(Operators.MUL);
   // if not pointer, check if &-reference
   let isAlias = false;
-  if (!isPointer) { isAlias = eat(Operators.BIN_AND); }
+  if (!isPointer)
+    isAlias = eat(Operators.BIN_AND);
   expectIdentifier();
-  const name = current.value;
+  const name = compiler.current.value;
   next();
-  const token = current.kind;
+  const token = compiler.current.kind;
   if (token === Operators.ASS) {
     node = parseVariableDeclaration(type, name, extern, isPointer, isAlias);
-  }
-  else if (TokenList.LPAREN) {
+  } else if (TokenList.LPAREN) {
     node = parseFunctionDeclaration(type, name, extern);
-  }
-  else {
+  } else {
     node = null;
-    __imports.error("Invalid keyword: " + current.value);
+    compiler.__imports.error("Invalid keyword: " + compiler.current.value);
   }
   return (node);
 };
@@ -262,7 +267,7 @@ function parseReturnStatement() {
     argument: parseExpression(Operators.LOWEST)
   };
   expectScope(node, Nodes.FunctionDeclaration);
-  let item = scope;
+  let item = compiler.scope;
   while (item !== null) {
     if (item && item.node.kind === Nodes.FunctionDeclaration) break;
     item = item.parent;
@@ -284,21 +289,22 @@ function parseFunctionDeclaration(type, name, extern) {
     prototype: null,
     body: null
   };
-  expectScope(node, null); // only allow global functions
+  // only allow global functions
+  expectScope(node, null);
   node.parameter = parseFunctionParameters(node);
   node.isPrototype = !eat(TokenList.LBRACE);
-  scope.register(name, node);
+  compiler.scope.register(name, node);
   if (!node.isPrototype) {
     pushScope(node);
     node.parameter.map((param) => {
-      scope.register(param.value, param);
+      compiler.scope.register(param.value, param);
     });
     node.body = parseBlock();
     popScope();
     expect(TokenList.RBRACE);
   }
   if (node.prototype !== null && node.type !== TokenList.VOID && !node.returns.length) {
-    __imports.error("Missing return in function: " + node.id);
+    compiler.__imports.error("Missing return in function: " + node.id);
   }
   return (node);
 };
@@ -320,19 +326,21 @@ function parseFunctionParameters(node) {
 function parseFunctionParameter(node) {
   let type = null;
   // type
-  if (isNativeType(current)) {
-    type = current.kind;
+  if (isNativeType(compiler.current)) {
+    type = compiler.current.kind;
     next();
   } else {
-    __imports.error("Missing type for parameter in", node.id);
+    compiler.__imports.error("Missing type for parameter in", node.id);
   }
   // *&
   let isPointer = eat(Operators.MUL);
   let isReference = false;
-  if (!isPointer) { isReference = eat(Operators.BIN_AND); }
+  if (!isPointer) {
+    isReference = eat(Operators.BIN_AND);
+  }
   // id
   expectIdentifier();
-  let param = current;
+  let param = compiler.current;
   param.type = type;
   param.kind = Nodes.Parameter;
   param.isParameter = true;
@@ -355,8 +363,8 @@ function parseVariableDeclaration(type, name, extern, isPointer, isAlias) {
   // only allow export of global variables
   if (extern) expectScope(node, null);
   //expectScope(node, Nodes.FunctionDeclaration);
-  scope.register(node.id, node);
-  if (scope.parent === null) {
+  compiler.scope.register(node.id, node);
+  if (compiler.scope.parent === null) {
     node.isGlobal = true;
   }
   expect(Operators.ASS);
@@ -380,7 +388,7 @@ function parseVariableDeclaration(type, name, extern, isPointer, isAlias) {
     };
   }
   if (!node.isGlobal) {
-    let fn = lookupFunctionScope(scope).node;
+    let fn = lookupFunctionScope(compiler.scope).node;
     fn.locals.push(node);
   }
   return (node);
@@ -397,7 +405,7 @@ function parseCallExpression(id) {
 
 function parseCallParameters(id) {
   let params = [];
-  let callee = scope.resolve(id);
+  let callee = compiler.scope.resolve(id);
   expect(TokenList.LPAREN);
   let index = 0;
   while (true) {
@@ -452,21 +460,21 @@ function parseCastExpression(left) {
   };
   next();
   expectTypeLiteral();
-  node.target = current;
+  node.target = compiler.current;
   next();
   return (node);
 };
 
 function expectTypeLiteral() {
-  if (!isNativeType(current)) {
-    __imports.error("Expected type literal but got " + current.kind);
+  if (!isNativeType(compiler.current)) {
+    compiler.__imports.error("Expected type literal but got " + compiler.current.kind);
   }
 };
 
 function parseUnaryPrefixExpression() {
   let node = {
     kind: Nodes.UnaryPrefixExpression,
-    operator: current.value,
+    operator: compiler.current.value,
     value: null
   };
   next();
@@ -477,7 +485,7 @@ function parseUnaryPrefixExpression() {
 function parseUnaryPostfixExpression(left) {
   let node = {
     kind: Nodes.UnaryPostfixExpression,
-    operator: current.value,
+    operator: compiler.current.value,
     value: left
   };
   next();
@@ -485,7 +493,7 @@ function parseUnaryPostfixExpression(left) {
 };
 
 function parsePrefix() {
-  if (isLiteral(current)) {
+  if (isLiteral(compiler.current)) {
     return (parseLiteral());
   }
   if (eat(TokenList.LPAREN)) {
@@ -493,14 +501,14 @@ function parsePrefix() {
     expect(TokenList.RPAREN);
     return (node);
   }
-  if (isUnaryPrefixOperator(current)) {
+  if (isUnaryPrefixOperator(compiler.current)) {
     return (parseUnaryPrefixExpression());
   }
   return (parseExpression(Operators.LOWEST));
 };
 
 function parseBinaryExpression(level, left) {
-  let operator = current.value;
+  let operator = compiler.current.value;
   let precedence = Operators[operator];
   if (level > precedence) return (left);
   let node = {
@@ -530,10 +538,10 @@ function parseBinaryExpression(level, left) {
 };
 
 function parseInfix(level, left) {
-  if (isBinaryOperator(current)) {
+  if (isBinaryOperator(compiler.current)) {
     return (parseBinaryExpression(level, left));
   }
-  if (isUnaryPostfixOperator(current)) {
+  if (isUnaryPostfixOperator(compiler.current)) {
     if (level >= Operators.UNARY_POSTFIX) {
       return (left);
     }
@@ -542,7 +550,7 @@ function parseInfix(level, left) {
   if (peek(TokenList.LPAREN)) {
     return (parseCallExpression(left));
   }
-  if (isCastOperator(current)) {
+  if (isCastOperator(compiler.current)) {
     return (parseCastExpression(left));
   }
   return (left);
@@ -557,7 +565,7 @@ function parseExpression(level) {
   }
   let node = parsePrefix();
   while (true) {
-    if (!current) break;
+    if (!compiler.current) break;
     let expr = parseInfix(level, node);
     if (expr === null || expr === node) break;
     node = expr;
@@ -566,8 +574,8 @@ function parseExpression(level) {
 };
 
 function parseLiteral() {
-  let value = current.value;
-  if (current.kind === Token.IDENTIFIER) {
+  let value = compiler.current.value;
+  if (compiler.current.kind === Token.IDENTIFIER) {
     /*let ignore = (
       value === "free" ||
       value === "malloc"
@@ -577,11 +585,11 @@ function parseLiteral() {
       global.register(value, {});
     }*/
     // make sure the identifier can be resolved
-    scope.resolve(value);
+    compiler.scope.resolve(value);
   }
   let node = {
     kind: Nodes.Literal,
-    type: current.kind,
+    type: compiler.current.kind,
     value: value
   };
   next();

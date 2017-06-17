@@ -32,7 +32,7 @@ const tests = [
   `1`
 ];
 
-test('function-pointer', t => {});
+test(t => {});
 
 export default tests;
 
