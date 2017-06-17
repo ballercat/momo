@@ -2,7 +2,7 @@ import test from 'ava';
 
 test('if', t => {});
 
-module.exports = [
+const tests = [
   ` int main() {
     int a = 5;
     if (a == 5) {

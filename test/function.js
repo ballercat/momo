@@ -2,7 +2,7 @@ import test from 'ava';
 
 test('function', t => {});
 
-module.exports = [
+const tests = [
   `int fact(int n) {
     if (n == 0) {
       return 1;

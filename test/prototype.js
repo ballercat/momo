@@ -2,7 +2,7 @@ import test from 'ava';
 
 test(t => {});
 
-module.exports = [
+const tests = [
  `int fact();
   int lol(int a, int b);
   extern int main() {

@@ -3,7 +3,7 @@ import test from 'ava';
 test('pointer', t => {});
 
 
-module.exports = [
+const tests = [
   `int swap(int *c, int *d) {
     int tmp = *c;
     *c = *d;

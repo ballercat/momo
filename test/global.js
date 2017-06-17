@@ -2,7 +2,7 @@ import test from 'ava';
 
 test('global', t => {});
 
-module.exports = [
+const tests = [
   `
   int test = 4;
    int main(int a, int b) {

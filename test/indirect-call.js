@@ -2,7 +2,7 @@ import test from 'ava';
 
 test('indirect-call', t => {});
 
-module.exports = [
+const tests = [
   `int add(int a, int b) {
     return (a + b);
   };

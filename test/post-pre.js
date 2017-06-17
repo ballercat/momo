@@ -2,7 +2,7 @@ import test from 'ava';
 
 test(t => {});
 
-module.exports = [
+const tests = [
   `int main() {
     int a = -10;
     return (-(++a + -30 - -10) * -8);
