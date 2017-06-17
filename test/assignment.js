@@ -1,4 +1,6 @@
-module.exports = [
+import test from 'ava';
+
+const tests = [
   ` int main() {
     int a = 10;
     int b = 20;
@@ -38,3 +40,9 @@ module.exports = [
   };`,
   `168`
 ];
+
+test('assignment', t => {
+});
+
+export default tests;
+
