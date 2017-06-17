@@ -1,6 +1,6 @@
 import test from 'ava';
 
-const tests = [
+test.todo('indirect-call', [
   `int add(int a, int b) {
     return (a + b);
   };
@@ -15,6 +15,5 @@ const tests = [
   };
   `,
   `8`
-];
-test(t => {});
+]);
 

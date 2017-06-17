@@ -1,6 +1,6 @@
 import test from 'ava';
 
-const tests = [
+test.todo('pointer', [
   `int swap(int *c, int *d) {
     int tmp = *c;
     *c = *d;
@@ -236,7 +236,6 @@ const tests = [
     return (*&ptr == &*ptr);
   };`,
   `1`
-];
-test('pointer', t => {});
+]);
 
 

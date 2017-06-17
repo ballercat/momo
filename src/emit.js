@@ -543,12 +543,12 @@ function emitVariableDeclaration(node) {
     insideVariableDeclaration = false;
     // store
     compiler.bytes.emitU8(WASM.OPCODE_I32_STORE);
-    compiler.bytes.emitU8(2); // i32
+     // i32
+    compiler.bytes.emitU8(2);
     compiler.bytes.emitU8(0);
-  }
-  // store alias
-  else if (resolve.isAlias) {
-    __imports.log("Store alias", node.id, "in memory at", resolve.offset);
+  } else if (resolve.isAlias) {
+    // store alias
+    compiler.__imports.log("Store alias", node.id, "in memory at", resolve.offset);
     // offset
     compiler.bytes.emitUi32(resolve.offset);
     growHeap(4);
@@ -556,12 +556,12 @@ function emitVariableDeclaration(node) {
     emitNode(node.aliasReference);
     // store
     compiler.bytes.emitU8(WASM.OPCODE_I32_STORE);
-    compiler.bytes.emitU8(2); // i32
+    // i32
+    compiler.bytes.emitU8(2);
     compiler.bytes.emitU8(0);
-  }
-  // store variable
-  else {
-    __imports.log("Store variable", node.id, "in memory at", resolve.offset);
+  } else {
+    // store variable
+    compiler.__imports.log("Store variable", node.id, "in memory at", resolve.offset);
     // offset
     compiler.bytes.emitUi32(resolve.offset);
     growHeap(4);
@@ -571,13 +571,14 @@ function emitVariableDeclaration(node) {
     insideVariableDeclaration = false;
     // store
     compiler.bytes.emitU8(WASM.OPCODE_I32_STORE);
-    compiler.bytes.emitU8(2); // i32
+    // i32
+    compiler.bytes.emitU8(2);
     compiler.bytes.emitU8(0);
   }
 };
 
 function getLoopDepthIndex() {
-  let ctx = scope;
+  let ctx = compiler.scope;
   let label = 0;
   while (ctx !== null) {
     label++;
@@ -589,7 +590,7 @@ function getLoopDepthIndex() {
 
 function emitPostfixExpression(node) {
   let local = node.value;
-  let resolve = scope.resolve(local.value);
+  let resolve = compiler.scope.resolve(local.value);
   if (node.operator === "++") {
     // store offset
     compiler.bytes.emitUi32(resolve.offset);
@@ -599,7 +600,8 @@ function emitPostfixExpression(node) {
     compiler.bytes.emitU8(WASM.OPCODE_I32_ADD);
     // pop store
     compiler.bytes.emitU8(WASM.OPCODE_I32_STORE);
-    compiler.bytes.emitU8(2); // i32
+    // i32
+    compiler.bytes.emitU8(2);
     compiler.bytes.emitU8(0);
     compiler.bytes.emitUi32(resolve.offset);
     // tee_local with load
@@ -614,7 +616,8 @@ function emitPostfixExpression(node) {
     compiler.bytes.emitU8(WASM.OPCODE_I32_SUB);
     // pop store
     compiler.bytes.emitU8(WASM.OPCODE_I32_STORE);
-    compiler.bytes.emitU8(2); // i32
+    // i32
+    compiler.bytes.emitU8(2);
     compiler.bytes.emitU8(0);
     compiler.bytes.emitUi32(resolve.offset);
     // tee_local with load

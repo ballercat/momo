@@ -1,6 +1,6 @@
 import test from 'ava';
 
-const tests = [
+test.todo('while', [
   ` int main() {
     int a = 5;
     while (a < 100) {
@@ -44,7 +44,6 @@ const tests = [
     return (c);
   };`,
   `42`
-];
+]);
 
-test(t => {});
 

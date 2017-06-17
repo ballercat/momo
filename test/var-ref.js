@@ -1,6 +1,6 @@
 import test from 'ava';
 
-const tests = [
+test.todo('var-ref', [
   `int main() {
     int  a = 300;
     int  b = 400;
@@ -52,6 +52,5 @@ const tests = [
   };
   `,
   `1`
-];
-test(t => {});
+]);
 

@@ -1,5 +1,5 @@
 import test from 'ava';
-import compile from '../dist/momo';
+import runTest from './utils';
 
 const tests = [
   ` int main() {
@@ -7,20 +7,17 @@ const tests = [
     int b = 20;
     return (a + b);
   };`,
-  `30`,
   ` int main() {
     int a = 10;
     int b = 20;
     a = b * 2;
     return (a);
   };`,
-  `40`,
   ` int main() {
     int a = 10;
     int b = a = 20;
     return (a + b);
   };`,
-  `40`,
   ` int main() {
     int a = 10;
     int aa = 11;
@@ -29,7 +26,6 @@ const tests = [
     int c = b = a = aa = aaa = a = 42;
     return (a + aa + aaa + b + c);
   };`,
-  `210`,
   ` int main() {
     int a = 10;
     int aa = 11;
@@ -38,13 +34,12 @@ const tests = [
     int c = 0;
     b = a = aa = aaa = a = 42;
     return (a + aa + aaa + b + c);
-  };`,
-  `168`
+  };`
 ];
 
-test(t => {
-  compile(tests[0]);
-});
+const results = [30, 40, 40, 210, 168];
+
+test('assignment', t => runTest(t, tests, results));
 
 export default tests;
 

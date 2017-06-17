@@ -1,20 +1,20 @@
 (function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(require('.const')) :
-	typeof define === 'function' && define.amd ? define(['.const'], factory) :
-	(factory(global._const));
-}(this, (function (_const) { 'use strict';
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory() :
+	typeof define === 'function' && define.amd ? define(factory) :
+	(factory());
+}(this, (function () { 'use strict';
 
 /** # Label generation # */
 
-var ii = 0;
+let ii = 0;
 
-var Nodes = {};
-var Token$1 = {};
-var TokenList$1 = {};
-var Operators$1 = {};
+let Nodes = {};
+let Token = {};
+let TokenList = {};
+let Operators = {};
 
 /** Types */
-(function (Label) {
+(Label => {
   Label[Label["Program"] = ++ii] = "Program";
   Label[Label["BinaryExpression"] = ++ii] = "BinaryExpression";
   Label[Label["UnaryExpression"] = ++ii] = "UnaryExpression";
@@ -43,7 +43,7 @@ var Operators$1 = {};
 })(Nodes);
 
 /** Data types */
-(function (Label) {
+(Label => {
   Label[Label["EOF"] = ++ii] = "EOF";
   Label[Label["Unknown"] = ++ii] = "Unknown";
   Label[Label["Keyword"] = ++ii] = "Keyword";
@@ -53,10 +53,10 @@ var Operators$1 = {};
   Label[Label["StringLiteral"] = ++ii] = "StringLiteral";
   Label[Label["NumericLiteral"] = ++ii] = "NumericLiteral";
   Label[Label["HexadecimalLiteral"] = ++ii] = "HexadecimalLiteral";
-})(Token$1);
+})(Token);
 
 /** Tokens */
-(function (Label) {
+(Label => {
   /** Punctuators */
   Label[Label["("] = ++ii] = "LPAREN";
   Label[Label[")"] = ++ii] = "RPAREN";
@@ -88,10 +88,10 @@ var Operators$1 = {};
   Label[Label["f64"] = ++ii] = "FLOAT64";
   Label[Label["void"] = ++ii] = "VOID";
   Label[Label["bool"] = ++ii] = "BOOLEAN";
-})(TokenList$1);
+})(TokenList);
 
 /** Operators */
-(function (Label) {
+(Label => {
   Label.LOWEST = ++ii;
   Label.UNARY_POSTFIX = ++ii;
   // order by precedence
@@ -122,14 +122,14 @@ var Operators$1 = {};
   Label[Label["++"] = ++ii] = "INCR";
   Label.UNARY_PREFIX = ++ii;
   Label.HIGHEST = ++ii;
-})(Operators$1);
+})(Operators);
 
 function getLabelName(index) {
   index = index | 0;
   if (Nodes[index] !== void 0) return Nodes[index];
-  if (Token$1[index] !== void 0) return Token$1[index];
-  if (TokenList$1[index] !== void 0) return TokenList$1[index];
-  if (Operators$1[index] !== void 0) return Operators$1[index];
+  if (Token[index] !== void 0) return Token[index];
+  if (TokenList[index] !== void 0) return TokenList[index];
+  if (Operators[index] !== void 0) return Operators[index];
   return "undefined";
 }
 
@@ -138,13 +138,13 @@ function getLabelName(index) {
  * str access key
  * for token list
  */
-(function () {
-  var items = [Nodes, Token$1, TokenList$1, Operators$1];
-  items.map(function (item) {
-    for (var key in item) {
-      var code = parseInt(key);
+(() => {
+  const items = [Nodes, Token, TokenList, Operators];
+  items.map(item => {
+    for (let key in item) {
+      const code = parseInt(key);
       if (!(code >= 0)) continue;
-      var nkey = item[key].toUpperCase();
+      const nkey = item[key].toUpperCase();
       item[nkey] = code;
     }
   });
@@ -153,7 +153,7 @@ function getLabelName(index) {
 // # Wasm codes
 
 // control flow operators
-var WASM = {
+const WASM = {
   OPCODE_UNREACHABLE: 0x00,
   OPCODE_NOP: 0x01,
   OPCODE_BLOCK: 0x02,
@@ -367,317 +367,189 @@ var WASM = {
   EXTERN_FUNC: 0x3
 };
 
-var classCallCheck = function (instance, Constructor) {
-  if (!(instance instanceof Constructor)) {
-    throw new TypeError("Cannot call a class as a function");
+class ByteArray extends Array {
+  emitU8(value) {
+    this.push(value & 0xff);
   }
-};
-
-var createClass = function () {
-  function defineProperties(target, props) {
-    for (var i = 0; i < props.length; i++) {
-      var descriptor = props[i];
-      descriptor.enumerable = descriptor.enumerable || false;
-      descriptor.configurable = true;
-      if ("value" in descriptor) descriptor.writable = true;
-      Object.defineProperty(target, descriptor.key, descriptor);
-    }
+  emitU16(value) {
+    this.push(value & 0xff);
+    this.push(value >> 8 & 0xff);
   }
-
-  return function (Constructor, protoProps, staticProps) {
-    if (protoProps) defineProperties(Constructor.prototype, protoProps);
-    if (staticProps) defineProperties(Constructor, staticProps);
-    return Constructor;
-  };
-}();
-
-
-
-
-
-
-
-
-
-var inherits = function (subClass, superClass) {
-  if (typeof superClass !== "function" && superClass !== null) {
-    throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
+  emitU32(value) {
+    this.push(value & 0xff);
+    this.push(value >> 8 & 0xff);
+    this.push(value >> 16 & 0xff);
+    this.push(value >> 24 & 0xff);
   }
-
-  subClass.prototype = Object.create(superClass && superClass.prototype, {
-    constructor: {
-      value: subClass,
-      enumerable: false,
-      writable: true,
-      configurable: true
-    }
-  });
-  if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
-};
-
-
-
-
-
-
-
-
-
-
-
-var possibleConstructorReturn = function (self, call) {
-  if (!self) {
-    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-  }
-
-  return call && (typeof call === "object" || typeof call === "function") ? call : self;
-};
-
-var ByteArray = function (_Array) {
-  inherits(ByteArray, _Array);
-
-  function ByteArray() {
-    classCallCheck(this, ByteArray);
-    return possibleConstructorReturn(this, (ByteArray.__proto__ || Object.getPrototypeOf(ByteArray)).apply(this, arguments));
-  }
-
-  createClass(ByteArray, [{
-    key: "emitU8",
-    value: function emitU8(value) {
-      this.push(value & 0xff);
-    }
-  }, {
-    key: "emitU16",
-    value: function emitU16(value) {
-      this.push(value & 0xff);
-      this.push(value >> 8 & 0xff);
-    }
-  }, {
-    key: "emitU32",
-    value: function emitU32(value) {
-      this.push(value & 0xff);
-      this.push(value >> 8 & 0xff);
-      this.push(value >> 16 & 0xff);
-      this.push(value >> 24 & 0xff);
-    }
-  }, {
-    key: "emitU32v",
-    value: function emitU32v(value) {
-      while (true) {
-        var v = value & 0xff;
-        value = value >>> 7;
-        if (value == 0) {
-          this.push(v);
-          break;
-        }
-        this.push(v | 0x80);
+  emitU32v(value) {
+    while (true) {
+      let v = value & 0xff;
+      value = value >>> 7;
+      if (value == 0) {
+        this.push(v);
+        break;
       }
+      this.push(v | 0x80);
     }
-  }, {
-    key: "emit32v",
-    value: function emit32v(value) {
-      while (true) {
-        var element = value & 127;
-        value = value >> 7;
-        var done = value === 0 && (element & 64) === 0 || value === -1 && (element & 64) !== 0;
-        if (!done) {
-          element = element | 128;
-        }
-        this.push(element & 255);
-        if (done) break;
+  }
+  emit32v(value) {
+    while (true) {
+      var element = value & 127;
+      value = value >> 7;
+      var done = value === 0 && (element & 64) === 0 || value === -1 && (element & 64) !== 0;
+      if (!done) {
+        element = element | 128;
       }
+      this.push(element & 255);
+      if (done) break;
     }
-  }, {
-    key: "emitULEB128",
-    value: function emitULEB128(value) {
-      var el = 0;
-      do {
-        el = value & 0x7F;
-        value = value >>> 7;
-        if (value) el = el | 0x80;
+  }
+  emitULEB128(value) {
+    let el = 0;
+    do {
+      el = value & 0x7F;
+      value = value >>> 7;
+      if (value) el = el | 0x80;
+      this.push(el);
+    } while (value);
+  }
+  emitLEB128(value) {
+    let el = 0;
+    do {
+      el = value & 0x7F;
+      value = value >>> 7;
+      let sign = (el & 0x40) !== 0;
+      if (value === 0 && !sign || value === -1 && sign) {
         this.push(el);
-      } while (value);
-    }
-  }, {
-    key: "emitLEB128",
-    value: function emitLEB128(value) {
-      var el = 0;
-      do {
-        el = value & 0x7F;
-        value = value >>> 7;
-        var sign = (el & 0x40) !== 0;
-        if (value === 0 && !sign || value === -1 && sign) {
-          this.push(el);
-          break;
-        } else {
-          el = el | 0x80;
-          this.push(el);
-        }
-      } while (true);
-    }
-  }, {
-    key: "patchLEB128",
-    value: function patchLEB128(value, offset) {
-      var el = 0;
-      var idx = 0;
-      do {
-        el = value & 0x7F;
-        value = value >>> 7;
-        var sign = (el & 0x40) !== 0;
-        if (value === 0 && !sign || value === -1 && sign) {
-          this[offset + idx] = el;
-          break;
-        } else {
-          el = el | 0x80;
-          this[offset + idx] = el;
-          idx++;
-        }
-      } while (true);
-    }
-  }, {
-    key: "patchULEB128",
-    value: function patchULEB128(value, offset) {
-      var el = 0;
-      var idx = 0;
-      do {
-        el = value & 0x7F;
-        value = value >>> 7;
-        if (value) el = el | 0x80;
+        break;
+      } else {
+        el = el | 0x80;
+        this.push(el);
+      }
+    } while (true);
+  }
+  patchLEB128(value, offset) {
+    let el = 0;
+    let idx = 0;
+    do {
+      el = value & 0x7F;
+      value = value >>> 7;
+      let sign = (el & 0x40) !== 0;
+      if (value === 0 && !sign || value === -1 && sign) {
+        this[offset + idx] = el;
+        break;
+      } else {
+        el = el | 0x80;
         this[offset + idx] = el;
         idx++;
-      } while (value);
+      }
+    } while (true);
+  }
+  patchULEB128(value, offset) {
+    let el = 0;
+    let idx = 0;
+    do {
+      el = value & 0x7F;
+      value = value >>> 7;
+      if (value) el = el | 0x80;
+      this[offset + idx] = el;
+      idx++;
+    } while (value);
+  }
+  createU32vPatch() {
+    this.writeVarUnsigned(~0);
+    let offset = this.length;
+    return {
+      offset: offset,
+      patch: value => {
+        this.patchU32v(value, offset - 5);
+      }
+    };
+  }
+  patchU32v(value, offset) {
+    var current = value >>> 0;
+    var max = -1 >>> 0;
+    while (true) {
+      var element = current & 127;
+      current = current >>> 7;
+      max = max >>> 7;
+      if (max !== 0) {
+        element = element | 128;
+      }
+      this[offset] = element & 255;
+      offset++;
+      if (max === 0) break;
     }
-  }, {
-    key: "createU32vPatch",
-    value: function createU32vPatch() {
-      var _this2 = this;
-
-      this.writeVarUnsigned(~0);
-      var offset = this.length;
-      return {
-        offset: offset,
-        patch: function patch(value) {
-          _this2.patchU32v(value, offset - 5);
-        }
-      };
-    }
-  }, {
-    key: "patchU32v",
-    value: function patchU32v(value, offset) {
-      var current = value >>> 0;
-      var max = -1 >>> 0;
-      while (true) {
-        var element = current & 127;
-        current = current >>> 7;
-        max = max >>> 7;
-        if (max !== 0) {
-          element = element | 128;
-        }
-        this[offset] = element & 255;
-        offset++;
-        if (max === 0) break;
+  }
+  writeVarUnsigned(value) {
+    var current = value >>> 0;
+    while (true) {
+      var element = current & 127;
+      current = current >>> 7;
+      if (current !== 0) {
+        element = element | 128;
+      }
+      this.push(element & 255);
+      if (current === 0) {
+        break;
       }
     }
-  }, {
-    key: "writeVarUnsigned",
-    value: function writeVarUnsigned(value) {
-      var current = value >>> 0;
-      while (true) {
-        var element = current & 127;
-        current = current >>> 7;
-        if (current !== 0) {
-          element = element | 128;
-        }
-        this.push(element & 255);
-        if (current === 0) {
-          break;
-        }
-      }
+  }
+  createLEB128Patch() {
+    let offset = this.length;
+    this.emitU8(0);
+    return {
+      offset: offset,
+      patch: value => this.patchLEB128(value, offset)
+    };
+  }
+  createULEB128Patch() {
+    let offset = this.length;
+    this.emitU8(0);
+    return {
+      offset: offset,
+      patch: value => this.patchULEB128(value, offset)
+    };
+  }
+  emitUi32(value) {
+    value = value | 0;
+    this.emitU8(WASM.OPCODE_I32_CONST);
+    this.writeVarUnsigned(value);
+  }
+  emitLoad32() {
+    this.emitU8(WASM.OPCODE_I32_LOAD);
+    // i32 alignment
+    this.emitU8(2);
+    this.writeVarUnsigned(0);
+  }
+  emitString(str) {
+    var length = str.length | 0;
+    this.emitU32v(length);
+    var offset = this.length;
+    var ii = 0;
+    while (ii < length) {
+      this.push(str.charCodeAt(ii) & 0xff);
+      ii++;
     }
-  }, {
-    key: "createLEB128Patch",
-    value: function createLEB128Patch() {
-      var _this3 = this;
+  }
+}
 
-      var offset = this.length;
-      this.emitU8(0);
-      return {
-        offset: offset,
-        patch: function patch(value) {
-          return _this3.patchLEB128(value, offset);
-        }
-      };
-    }
-  }, {
-    key: "createULEB128Patch",
-    value: function createULEB128Patch() {
-      var _this4 = this;
-
-      var offset = this.length;
-      this.emitU8(0);
-      return {
-        offset: offset,
-        patch: function patch(value) {
-          return _this4.patchULEB128(value, offset);
-        }
-      };
-    }
-  }, {
-    key: "emitUi32",
-    value: function emitUi32(value) {
-      value = value | 0;
-      this.emitU8(WASM.OPCODE_I32_CONST);
-      this.writeVarUnsigned(value);
-    }
-  }, {
-    key: "emitLoad32",
-    value: function emitLoad32() {
-      this.emitU8(WASM.OPCODE_I32_LOAD);
-      // i32 alignment
-      this.emitU8(2);
-      this.writeVarUnsigned(0);
-    }
-  }, {
-    key: "emitString",
-    value: function emitString(str) {
-      var length = str.length | 0;
-      this.emitU32v(length);
-      var offset = this.length;
-      var ii = 0;
-      while (ii < length) {
-        this.push(str.charCodeAt(ii) & 0xff);
-        ii++;
-      }
-    }
-  }]);
-  return ByteArray;
-}(Array);
-
-var Compiler = function () {
-  function Compiler() {
-    var imports = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
-    classCallCheck(this, Compiler);
-
+class Compiler {
+  constructor(imports = null) {
     this.reset(imports);
   }
 
-  createClass(Compiler, [{
-    key: 'reset',
-    value: function reset(imports) {
-      this.bytes = new ByteArray();
-      this.scope = null;
-      this._global = null;
-      this.pindex = 0;
-      this.tokens = null;
-      this.current = null;
-      this.__imports = imports;
-      this.currentHeapOffset = null;
-    }
-  }]);
-  return Compiler;
-}();
-
-
+  reset(imports) {
+    this.bytes = new ByteArray();
+    this.scope = null;
+    this._global = null;
+    this.pindex = 0;
+    this.tokens = null;
+    this.current = null;
+    this.__imports = imports;
+    this.currentHeapOffset = null;
+  }
+}
 
 // # compiler syngleton
 var compiler = new Compiler();
@@ -715,22 +587,22 @@ function Scope() {
     // append local index for non-global variables
     if (this.parent !== null) {
       if (node.kind === Nodes.VariableDeclaration || node.kind === Nodes.Parameter) {
-        var scope = lookupFunctionScope(this);
+        let scope = lookupFunctionScope(this);
         node.index = scope.localIndex++;
       }
     }
   };
   this.registerFunction = function (id, node) {
     // allow function to get overwritten (e.g function prototypes)
-    var resolve = this.symbols[id] || null;
+    let resolve = this.symbols[id] || null;
     // function already defined, overwrite if prototype
     if (resolve) {
       if (resolve.type !== node.type) {
-        compiler.__imports.error('Conflicting types for \'' + id + '\'');
+        compiler.__imports.error(`Conflicting types for '${id}'`);
       }
       // TODO: validate parameter types
       if (!resolve.isPrototype && !node.isPrototype) {
-        compiler.__imports.error('Redefinition of \'' + id + '\'');
+        compiler.__imports.error(`Redefinition of '${id}'`);
       }
     }
     this.symbols[id] = node;
@@ -738,7 +610,7 @@ function Scope() {
 }
 
 function lookupFunctionScope(scope) {
-  var ctx = scope;
+  let ctx = scope;
   while (ctx !== null) {
     if (ctx.node.kind === Nodes.FunctionDeclaration) break;
     ctx = ctx.parent;
@@ -747,7 +619,7 @@ function lookupFunctionScope(scope) {
 }
 
 function pushScope(node) {
-  var scp = new Scope();
+  let scp = new Scope();
   scp.node = node;
   scp.parent = compiler.scope;
   scp.index = compiler.scope ? compiler.scope.index + 1 : 0;
@@ -762,7 +634,7 @@ function popScope() {
 }
 
 function expectScope(node, kind) {
-  var item = compiler.scope;
+  let item = compiler.scope;
   while (item !== null) {
     if (item && item.node.kind === kind) break;
     item = item.parent;
@@ -773,32 +645,32 @@ function expectScope(node, kind) {
 }
 
 function isBinaryOperator(token) {
-  var kind = token.kind;
-  return (kind === Operators$1.ASS || kind === Operators$1.ADD || kind === Operators$1.SUB || kind === Operators$1.MUL || kind === Operators$1.DIV || kind === Operators$1.MOD || kind === Operators$1.OR || kind === Operators$1.AND || kind === Operators$1.BIN_AND || kind === Operators$1.BIN_OR || kind === Operators$1.NOT || kind === Operators$1.LT || kind === Operators$1.LE || kind === Operators$1.GT || kind === Operators$1.GE || kind === Operators$1.EQ || kind === Operators$1.NEQ || kind === Operators$1.ADD_ASS || kind === Operators$1.SUB_ASS || kind === Operators$1.MUL_ASS || kind === Operators$1.DIV_ASS || kind === Operators$1.MOD_ASS) && kind !== Operators$1.NOT && kind !== Operators$1.INCR && kind !== Operators$1.DECR;
+  let kind = token.kind;
+  return (kind === Operators.ASS || kind === Operators.ADD || kind === Operators.SUB || kind === Operators.MUL || kind === Operators.DIV || kind === Operators.MOD || kind === Operators.OR || kind === Operators.AND || kind === Operators.BIN_AND || kind === Operators.BIN_OR || kind === Operators.NOT || kind === Operators.LT || kind === Operators.LE || kind === Operators.GT || kind === Operators.GE || kind === Operators.EQ || kind === Operators.NEQ || kind === Operators.ADD_ASS || kind === Operators.SUB_ASS || kind === Operators.MUL_ASS || kind === Operators.DIV_ASS || kind === Operators.MOD_ASS) && kind !== Operators.NOT && kind !== Operators.INCR && kind !== Operators.DECR;
 }
 
 function isAssignmentOperator(kind) {
-  return kind === Operators$1.ASS || kind === Operators$1.ADD_ASS || kind === Operators$1.SUB_ASS || kind === Operators$1.MUL_ASS || kind === Operators$1.DIV_ASS || kind === Operators$1.MOD_ASS;
+  return kind === Operators.ASS || kind === Operators.ADD_ASS || kind === Operators.SUB_ASS || kind === Operators.MUL_ASS || kind === Operators.DIV_ASS || kind === Operators.MOD_ASS;
 }
 
 function isUnaryPrefixOperator(token) {
-  var kind = token.kind;
-  return kind === Operators$1.BIN_AND || kind === Operators$1.MUL || kind === Operators$1.SUB || kind === Operators$1.ADD || kind === Operators$1.NOT || kind === Operators$1.INCR || kind === Operators$1.DECR;
+  let kind = token.kind;
+  return kind === Operators.BIN_AND || kind === Operators.MUL || kind === Operators.SUB || kind === Operators.ADD || kind === Operators.NOT || kind === Operators.INCR || kind === Operators.DECR;
 }
 
 function isUnaryPostfixOperator(token) {
-  var kind = token.kind;
-  return kind === Operators$1.INCR || kind === Operators$1.DECR;
+  let kind = token.kind;
+  return kind === Operators.INCR || kind === Operators.DECR;
 }
 
 function isLiteral(token) {
-  var kind = token.kind;
-  return kind === Token$1.NumericLiteral || kind === Token$1.HexadecimalLiteral || kind === Token$1.BooleanLiteral || kind === Token$1.Identifier;
+  let kind = token.kind;
+  return kind === Token.NumericLiteral || kind === Token.HexadecimalLiteral || kind === Token.BooleanLiteral || kind === Token.Identifier;
 }
 
 function isNativeType(token) {
-  var kind = token.kind;
-  return kind === TokenList$1.INT || kind === TokenList$1.INT32 || kind === TokenList$1.INT64 || kind === TokenList$1.FLOAT || kind === TokenList$1.FLOAT32 || kind === TokenList$1.FLOAT64 || kind === TokenList$1.VOID || kind === TokenList$1.BOOLEAN;
+  let kind = token.kind;
+  return kind === TokenList.INT || kind === TokenList.INT32 || kind === TokenList.INT64 || kind === TokenList.FLOAT || kind === TokenList.FLOAT32 || kind === TokenList.FLOAT64 || kind === TokenList.VOID || kind === TokenList.BOOLEAN;
 }
 
 // # Parser #
@@ -806,7 +678,7 @@ function parse(tkns) {
   compiler.tokens = tkns;
   compiler.pindex = -1;
   next();
-  var node = {
+  let node = {
     kind: Nodes["Program"],
     body: null
   };
@@ -826,9 +698,7 @@ function next() {
 }
 
 function expect(kind) {
-  var current = compiler.current,
-      __imports = compiler.__imports;
-
+  const { current, __imports } = compiler;
   if (current.kind !== kind) {
     __imports.error("Expected " + kind + " but got " + current.kind + " in " + current.line + ":" + current.column);
   } else {
@@ -837,11 +707,9 @@ function expect(kind) {
 }
 
 function expectIdentifier() {
-  var current = compiler.current,
-      __imports = compiler.__imports;
-
-  if (current.kind !== Token$1.IDENTIFIER) {
-    __imports.error("Expected " + Token$1.IDENTIFIER + ":identifier but got " + current.kind + ":" + current.value);
+  const { current, __imports } = compiler;
+  if (current.kind !== Token.IDENTIFIER) {
+    __imports.error("Expected " + Token.IDENTIFIER + ":identifier but got " + current.kind + ":" + current.value);
   }
 }
 
@@ -854,15 +722,15 @@ function eat(kind) {
 }
 
 function parseBlock() {
-  var node = {
+  let node = {
     kind: Nodes.BlockStatement,
     body: [],
     context: compiler.scope
   };
   while (true) {
     if (!compiler.current) break;
-    if (peek(TokenList$1.RBRACE)) break;
-    var child = parseStatement();
+    if (peek(TokenList.RBRACE)) break;
+    let child = parseStatement();
     if (child === null) break;
     node.body.push(child);
   }
@@ -870,46 +738,44 @@ function parseBlock() {
 }
 
 function parseStatement() {
-  var current = compiler.current,
-      __imports = compiler.__imports;
-
-  var node = null;
-  if (eat(TokenList$1.EXPORT)) {
+  const { current, __imports } = compiler;
+  let node = null;
+  if (eat(TokenList.EXPORT)) {
     node = parseDeclaration(true);
   } else if (isNativeType(current)) {
     node = parseDeclaration(false);
-  } else if (peek(TokenList$1.RETURN)) {
+  } else if (peek(TokenList.RETURN)) {
     node = parseReturnStatement();
-  } else if (peek(TokenList$1.IF)) {
+  } else if (peek(TokenList.IF)) {
     node = parseIfStatement();
-  } else if (peek(TokenList$1.WHILE)) {
+  } else if (peek(TokenList.WHILE)) {
     node = parseWhileStatement();
   } else {
-    node = parseExpression(Operators$1.LOWEST);
+    node = parseExpression(Operators.LOWEST);
     if (node === null) {
       __imports.error("Unknown node kind " + current.value + " in " + current.line + ":" + current.column);
     }
   }
-  eat(TokenList$1.SEMICOLON);
+  eat(TokenList.SEMICOLON);
   return node;
 }
 
 function parseDeclaration(extern) {
-  var node = null;
+  let node = null;
   expectTypeLiteral();
-  var type = compiler.current.kind;
+  const type = compiler.current.kind;
   next();
-  var isPointer = eat(Operators$1.MUL);
+  let isPointer = eat(Operators.MUL);
   // if not pointer, check if &-reference
-  var isAlias = false;
-  if (!isPointer) isAlias = eat(Operators$1.BIN_AND);
+  let isAlias = false;
+  if (!isPointer) isAlias = eat(Operators.BIN_AND);
   expectIdentifier();
-  var name = compiler.current.value;
+  const name = compiler.current.value;
   next();
-  var token = compiler.current.kind;
-  if (token === Operators$1.ASS) {
+  const token = compiler.current.kind;
+  if (token === Operators.ASS) {
     node = parseVariableDeclaration(type, name, extern, isPointer, isAlias);
-  } else if (TokenList$1.LPAREN) {
+  } else if (TokenList.LPAREN) {
     node = parseFunctionDeclaration(type, name, extern);
   } else {
     node = null;
@@ -919,75 +785,75 @@ function parseDeclaration(extern) {
 }
 
 function parseWhileStatement() {
-  var node = {
+  let node = {
     kind: Nodes.WhileStatement,
     condition: null,
     body: null
   };
-  expect(TokenList$1.WHILE);
-  node.condition = parseExpression(Operators$1.LOWEST);
+  expect(TokenList.WHILE);
+  node.condition = parseExpression(Operators.LOWEST);
   // braced body
-  if (eat(TokenList$1.LBRACE)) {
+  if (eat(TokenList.LBRACE)) {
     pushScope(node);
     node.body = parseBlock();
     popScope();
-    expect(TokenList$1.RBRACE);
+    expect(TokenList.RBRACE);
     // short body
   } else {
-    node.body = parseExpression(Operators$1.LOWEST);
+    node.body = parseExpression(Operators.LOWEST);
   }
   return node;
 }
 
 function parseIfStatement() {
-  var node = {
+  let node = {
     kind: Nodes.IfStatement,
     condition: null,
     alternate: null,
     consequent: null
   };
   // else
-  if (!eat(TokenList$1.IF)) {
+  if (!eat(TokenList.IF)) {
     pushScope(node);
     node.consequent = parseIfBody();
     popScope();
     return node;
   }
-  expect(TokenList$1.LPAREN);
-  node.condition = parseExpression(Operators$1.LOWEST);
-  expect(TokenList$1.RPAREN);
+  expect(TokenList.LPAREN);
+  node.condition = parseExpression(Operators.LOWEST);
+  expect(TokenList.RPAREN);
   pushScope(node);
   node.consequent = parseIfBody();
   popScope();
-  if (eat(TokenList$1.ELSE)) {
+  if (eat(TokenList.ELSE)) {
     node.alternate = parseIfStatement();
   }
   return node;
 }
 
 function parseIfBody() {
-  var node = null;
+  let node = null;
   // braced if
-  if (eat(TokenList$1.LBRACE)) {
+  if (eat(TokenList.LBRACE)) {
     node = parseBlock();
-    expect(TokenList$1.RBRACE);
+    expect(TokenList.RBRACE);
     // short if
   } else {
     node = [];
-    node.push(parseExpression(Operators$1.LOWEST));
-    eat(TokenList$1.SEMICOLON);
+    node.push(parseExpression(Operators.LOWEST));
+    eat(TokenList.SEMICOLON);
   }
   return node;
 }
 
 function parseReturnStatement() {
-  expect(TokenList$1.RETURN);
-  var node = {
+  expect(TokenList.RETURN);
+  let node = {
     kind: Nodes.ReturnStatement,
-    argument: parseExpression(Operators$1.LOWEST)
+    argument: parseExpression(Operators.LOWEST)
   };
   expectScope(node, Nodes.FunctionDeclaration);
-  var item = compiler.scope;
+  let item = compiler.scope;
   while (item !== null) {
     if (item && item.node.kind === Nodes.FunctionDeclaration) break;
     item = item.parent;
@@ -997,7 +863,7 @@ function parseReturnStatement() {
 }
 
 function parseFunctionDeclaration(type, name, extern) {
-  var node = {
+  let node = {
     index: 0,
     isExported: !!extern,
     kind: Nodes.FunctionDeclaration,
@@ -1012,39 +878,39 @@ function parseFunctionDeclaration(type, name, extern) {
   // only allow global functions
   expectScope(node, null);
   node.parameter = parseFunctionParameters(node);
-  node.isPrototype = !eat(TokenList$1.LBRACE);
+  node.isPrototype = !eat(TokenList.LBRACE);
   compiler.scope.register(name, node);
   if (!node.isPrototype) {
     pushScope(node);
-    node.parameter.map(function (param) {
+    node.parameter.map(param => {
       compiler.scope.register(param.value, param);
     });
     node.body = parseBlock();
     popScope();
-    expect(TokenList$1.RBRACE);
+    expect(TokenList.RBRACE);
   }
-  if (node.prototype !== null && node.type !== TokenList$1.VOID && !node.returns.length) {
+  if (node.prototype !== null && node.type !== TokenList.VOID && !node.returns.length) {
     compiler.__imports.error("Missing return in function: " + node.id);
   }
   return node;
 }
 
 function parseFunctionParameters(node) {
-  var params = [];
-  var hasPrototype = node.prototype !== null;
-  expect(TokenList$1.LPAREN);
+  let params = [];
+  let hasPrototype = node.prototype !== null;
+  expect(TokenList.LPAREN);
   while (true) {
-    if (peek(TokenList$1.RPAREN)) break;
-    var param = parseFunctionParameter(node);
+    if (peek(TokenList.RPAREN)) break;
+    let param = parseFunctionParameter(node);
     params.push(param);
-    if (!eat(TokenList$1.COMMA)) break;
+    if (!eat(TokenList.COMMA)) break;
   }
-  expect(TokenList$1.RPAREN);
+  expect(TokenList.RPAREN);
   return params;
 }
 
 function parseFunctionParameter(node) {
-  var type = null;
+  let type = null;
   // type
   if (isNativeType(compiler.current)) {
     type = compiler.current.kind;
@@ -1053,14 +919,14 @@ function parseFunctionParameter(node) {
     compiler.__imports.error("Missing type for parameter in", node.id);
   }
   // *&
-  var isPointer = eat(Operators$1.MUL);
-  var isReference = false;
+  let isPointer = eat(Operators.MUL);
+  let isReference = false;
   if (!isPointer) {
-    isReference = eat(Operators$1.BIN_AND);
+    isReference = eat(Operators.BIN_AND);
   }
   // id
   expectIdentifier();
-  var param = compiler.current;
+  let param = compiler.current;
   param.type = type;
   param.kind = Nodes.Parameter;
   param.isParameter = true;
@@ -1071,14 +937,14 @@ function parseFunctionParameter(node) {
 }
 
 function parseVariableDeclaration(type, name, extern, isPointer, isAlias) {
-  var node = {
+  let node = {
     kind: Nodes.VariableDeclaration,
     type: type,
     id: name,
     init: null,
     isGlobal: false,
-    isPointer: isPointer,
-    isAlias: isAlias
+    isPointer,
+    isAlias
   };
   // only allow export of global variables
   if (extern) expectScope(node, null);
@@ -1087,13 +953,13 @@ function parseVariableDeclaration(type, name, extern, isPointer, isAlias) {
   if (compiler.scope.parent === null) {
     node.isGlobal = true;
   }
-  expect(Operators$1.ASS);
-  var init = parseExpression(Operators$1.LOWEST);
+  expect(Operators.ASS);
+  let init = parseExpression(Operators.LOWEST);
   node.init = {
     kind: Nodes.BinaryExpression,
     left: {
       kind: Nodes.Literal,
-      type: Token$1.Identifier,
+      type: Token.Identifier,
       value: node.id
     },
     right: init,
@@ -1108,14 +974,14 @@ function parseVariableDeclaration(type, name, extern, isPointer, isAlias) {
     };
   }
   if (!node.isGlobal) {
-    var fn = lookupFunctionScope(compiler.scope).node;
+    let fn = lookupFunctionScope(compiler.scope).node;
     fn.locals.push(node);
   }
   return node;
 }
 
 function parseCallExpression(id) {
-  var node = {
+  let node = {
     kind: Nodes.CallExpression,
     callee: id,
     parameter: parseCallParameters(id.value)
@@ -1124,13 +990,13 @@ function parseCallExpression(id) {
 }
 
 function parseCallParameters(id) {
-  var params = [];
-  var callee = compiler.scope.resolve(id);
-  expect(TokenList$1.LPAREN);
-  var index = 0;
+  let params = [];
+  let callee = compiler.scope.resolve(id);
+  expect(TokenList.LPAREN);
+  let index = 0;
   while (true) {
-    if (peek(TokenList$1.RPAREN)) break;
-    var expr = parseExpression(Operators$1.LOWEST);
+    if (peek(TokenList.RPAREN)) break;
+    let expr = parseExpression(Operators.LOWEST);
     //let isReference = callee.parameter[index].isReference;
     //let isReference = false;
     // called functions parameter expects reference
@@ -1143,37 +1009,37 @@ function parseCallParameters(id) {
       };
     }*/
     params.push(expr);
-    if (!eat(TokenList$1.COMMA)) break;
+    if (!eat(TokenList.COMMA)) break;
     index++;
   }
-  expect(TokenList$1.RPAREN);
+  expect(TokenList.RPAREN);
   return params;
 }
 
 function parseBreak() {
-  var node = {
+  let node = {
     kind: Nodes.BreakStatement
   };
-  expect(TokenList$1.BREAK);
+  expect(TokenList.BREAK);
   expectScope(node, Nodes.WhileStatement);
   return node;
 }
 
 function parseContinue() {
-  var node = {
+  let node = {
     kind: Nodes.ContinueStatement
   };
-  expect(TokenList$1.CONTINUE);
+  expect(TokenList.CONTINUE);
   expectScope(node, Nodes.WhileStatement);
   return node;
 }
 
 function isCastOperator(token) {
-  return token.kind === Operators$1.CAST;
+  return token.kind === Operators.CAST;
 }
 
 function parseCastExpression(left) {
-  var node = {
+  let node = {
     kind: Nodes.CastExpression,
     source: left,
     target: null
@@ -1192,18 +1058,18 @@ function expectTypeLiteral() {
 }
 
 function parseUnaryPrefixExpression() {
-  var node = {
+  let node = {
     kind: Nodes.UnaryPrefixExpression,
     operator: compiler.current.value,
     value: null
   };
   next();
-  node.value = parseExpression(Operators$1.UNARY_PREFIX);
+  node.value = parseExpression(Operators.UNARY_PREFIX);
   return node;
 }
 
 function parseUnaryPostfixExpression(left) {
-  var node = {
+  let node = {
     kind: Nodes.UnaryPostfixExpression,
     operator: compiler.current.value,
     value: left
@@ -1216,22 +1082,22 @@ function parsePrefix() {
   if (isLiteral(compiler.current)) {
     return parseLiteral();
   }
-  if (eat(TokenList$1.LPAREN)) {
-    var node = parseExpression(Operators$1.LOWEST);
-    expect(TokenList$1.RPAREN);
+  if (eat(TokenList.LPAREN)) {
+    let node = parseExpression(Operators.LOWEST);
+    expect(TokenList.RPAREN);
     return node;
   }
   if (isUnaryPrefixOperator(compiler.current)) {
     return parseUnaryPrefixExpression();
   }
-  return parseExpression(Operators$1.LOWEST);
+  return parseExpression(Operators.LOWEST);
 }
 
 function parseBinaryExpression(level, left) {
-  var operator = compiler.current.value;
-  var precedence = Operators$1[operator];
+  let operator = compiler.current.value;
+  let precedence = Operators[operator];
   if (level > precedence) return left;
-  var node = {
+  let node = {
     kind: Nodes.BinaryExpression,
     left: left,
     right: null,
@@ -1239,9 +1105,9 @@ function parseBinaryExpression(level, left) {
   };
   next();
   node.right = parseExpression(precedence);
-  var okind = Operators$1[operator];
-  if (isAssignmentOperator(okind) && okind !== Operators$1.ASS) {
-    var right = {
+  let okind = Operators[operator];
+  if (isAssignmentOperator(okind) && okind !== Operators.ASS) {
+    let right = {
       kind: Nodes.BinaryExpression,
       left: node.left,
       operator: "=",
@@ -1262,12 +1128,12 @@ function parseInfix(level, left) {
     return parseBinaryExpression(level, left);
   }
   if (isUnaryPostfixOperator(compiler.current)) {
-    if (level >= Operators$1.UNARY_POSTFIX) {
+    if (level >= Operators.UNARY_POSTFIX) {
       return left;
     }
     return parseUnaryPostfixExpression(left);
   }
-  if (peek(TokenList$1.LPAREN)) {
+  if (peek(TokenList.LPAREN)) {
     return parseCallExpression(left);
   }
   if (isCastOperator(compiler.current)) {
@@ -1277,16 +1143,16 @@ function parseInfix(level, left) {
 }
 
 function parseExpression(level) {
-  if (peek(TokenList$1.BREAK)) {
+  if (peek(TokenList.BREAK)) {
     return parseBreak();
   }
-  if (peek(TokenList$1.CONTINUE)) {
+  if (peek(TokenList.CONTINUE)) {
     return parseContinue();
   }
-  var node = parsePrefix();
+  let node = parsePrefix();
   while (true) {
     if (!compiler.current) break;
-    var expr = parseInfix(level, node);
+    let expr = parseInfix(level, node);
     if (expr === null || expr === node) break;
     node = expr;
   }
@@ -1294,8 +1160,8 @@ function parseExpression(level) {
 }
 
 function parseLiteral() {
-  var value = compiler.current.value;
-  if (compiler.current.kind === Token$1.IDENTIFIER) {
+  let value = compiler.current.value;
+  if (compiler.current.kind === Token.IDENTIFIER) {
     /*let ignore = (
       value === "free" ||
       value === "malloc"
@@ -1307,7 +1173,7 @@ function parseLiteral() {
     // make sure the identifier can be resolved
     compiler.scope.resolve(value);
   }
-  var node = {
+  let node = {
     kind: Nodes.Literal,
     type: compiler.current.kind,
     value: value
@@ -1350,16 +1216,16 @@ function isOperator(str) {
 }
 
 function processToken(tokens, value, line, column) {
-  var kind = _const.Token.UNKNOWN;
-  if (_const.TokenList[value] >= 0) kind = _const.TokenList[value];else if (_const.Operators[value] >= 0) kind = _const.Operators[value];else kind = _const.Token["Identifier"];
-  var token = createToken(kind, value, line, column - value.length);
+  let kind = Token.UNKNOWN;
+  if (TokenList[value] >= 0) kind = TokenList[value];else if (Operators[value] >= 0) kind = Operators[value];else kind = Token["Identifier"];
+  let token = createToken(kind, value, line, column - value.length);
   tokens.push(token);
   return token;
 }
 
 // # Scanner #
 function createToken(kind, value, line, column) {
-  var token = {
+  let token = {
     kind: kind,
     value: value,
     line: line,
@@ -1369,11 +1235,11 @@ function createToken(kind, value, line, column) {
 }
 
 function scan(str) {
-  var ii = -1;
-  var line = 1;
-  var column = 0;
-  var length = str.length;
-  var tokens = [];
+  let ii = -1;
+  let line = 1;
+  let column = 0;
+  let length = str.length;
+  let tokens = [];
 
   function next() {
     ii++;
@@ -1392,8 +1258,8 @@ function scan(str) {
 
   while (true) {
     next();
-    var ch = str.charAt(ii);
-    var cc = str.charCodeAt(ii);
+    let ch = str.charAt(ii);
+    let cc = str.charCodeAt(ii);
     // blank [/s,/n]
     if (isBlank(cc)) {
       continue;
@@ -1405,7 +1271,7 @@ function scan(str) {
     }
     // alphabetical [aA-zZ]
     if (isAlpha(cc)) {
-      var start = ii;
+      let start = ii;
       while (true) {
         if (!isAlpha(cc) && !isNumber(cc)) {
           ii--;
@@ -1415,7 +1281,7 @@ function scan(str) {
         next();
         cc = str.charCodeAt(ii);
       }
-      var content = str.slice(start, ii + 1);
+      let content = str.slice(start, ii + 1);
       processToken(tokens, content, line, column);
       continue;
     }
@@ -1423,7 +1289,7 @@ function scan(str) {
     if (isNumber(cc)) {
       // hexadecimal
       if (str.charAt(ii + 1) === "x") {
-        var _start2 = ii;
+        let start = ii;
         next();
         while (true) {
           if (!isHex(cc)) {
@@ -1434,12 +1300,12 @@ function scan(str) {
           next();
           cc = str.charCodeAt(ii);
         }
-        var _content2 = str.slice(_start2, ii + 1);
-        var _token = createToken(_const.Token.HexadecimalLiteral, _content2, line, column);
-        tokens.push(_token);
+        let content = str.slice(start, ii + 1);
+        let token = createToken(Token.HexadecimalLiteral, content, line, column);
+        tokens.push(token);
         continue;
       }
-      var _start = ii;
+      let start = ii;
       while (true) {
         if (!isNumber(cc) && cc !== 45) {
           ii--;
@@ -1449,8 +1315,8 @@ function scan(str) {
         next();
         cc = str.charCodeAt(ii);
       }
-      var _content = str.slice(_start, ii + 1);
-      var token = createToken(_const.Token.NumericLiteral, _content, line, column);
+      let content = str.slice(start, ii + 1);
+      let token = createToken(Token.NumericLiteral, content, line, column);
       tokens.push(token);
       continue;
     }
@@ -1470,13 +1336,13 @@ function scan(str) {
     }
     // punctuator [;,(,)]
     if (isPunctuatorChar(ch)) {
-      var _content3 = str.slice(ii, ii + 1);
-      processToken(tokens, _content3, line, column);
+      let content = str.slice(ii, ii + 1);
+      processToken(tokens, content, line, column);
       continue;
     }
     // single operator [+,-,=]
     if (isOperatorChar(ch)) {
-      var second = str.slice(ii + 1, ii + 2);
+      let second = str.slice(ii + 1, ii + 2);
       processOperator(ch, second, line, column);
       continue;
     }
@@ -1489,17 +1355,17 @@ function scan(str) {
 
 function getWasmType(type) {
   switch (type) {
-    case TokenList$1.VOID:
+    case TokenList.VOID:
       return WASM.TYPE_CTOR_VOID;
-    case TokenList$1.INT:case TokenList$1.INT32:
+    case TokenList.INT:case TokenList.INT32:
       return WASM.TYPE_CTOR_I32;
-    case TokenList$1.INT64:
+    case TokenList.INT64:
       return WASM.TYPE_CTOR_I64;
-    case TokenList$1.FLOAT:case TokenList$1.FLOAT32:
+    case TokenList.FLOAT:case TokenList.FLOAT32:
       return WASM.TYPE_CTOR_I32;
-    case TokenList$1.FLOAT64:
+    case TokenList.FLOAT64:
       return WASM.TYPE_CTOR_F64;
-    case TokenList$1.BOOL:
+    case TokenList.BOOL:
       return WASM.TYPE_CTOR_I32;
   }
   return -1;
@@ -1565,10 +1431,10 @@ function emit(node) {
 
 function emitElementSection(node) {
   compiler.bytes.emitU8(WASM.SECTION_ELEMENT);
-  var size = compiler.bytes.createU32vPatch();
-  var count = compiler.bytes.createU32vPatch();
-  var amount = 0;
-  node.body.map(function (child) {
+  let size = compiler.bytes.createU32vPatch();
+  let count = compiler.bytes.createU32vPatch();
+  let amount = 0;
+  node.body.map(child => {
     if (child.kind === Nodes.FunctionDeclaration && !child.isPrototype) {
       // link to anyfunc table
       compiler.bytes.writeVarUnsigned(0);
@@ -1585,9 +1451,9 @@ function emitElementSection(node) {
 
 function emitTableSection(node) {
   compiler.bytes.emitU8(WASM.SECTION_TABLE);
-  var size = compiler.bytes.createU32vPatch();
-  var count = compiler.bytes.createU32vPatch();
-  var amount = 1;
+  let size = compiler.bytes.createU32vPatch();
+  let count = compiler.bytes.createU32vPatch();
+  let amount = 1;
   // mvp only allows <= 1
   emitFunctionTable(node);
   count.patch(amount);
@@ -1599,8 +1465,8 @@ function emitFunctionTable(node) {
   compiler.bytes.emitU8(WASM.TYPE_CTOR_ANYFUNC);
   // flags
   compiler.bytes.emitU8(1);
-  var count = 0;
-  node.body.map(function (child) {
+  let count = 0;
+  node.body.map(child => {
     if (child.kind === Nodes.FunctionDeclaration && !child.isPrototype) {
       count++;
     }
@@ -1613,12 +1479,12 @@ function emitFunctionTable(node) {
 
 function emitGlobalSection(node) {
   compiler.bytes.emitU8(WASM.SECTION_GLOBAL);
-  var size = compiler.bytes.createU32vPatch();
-  var count = compiler.bytes.createU32vPatch();
-  var amount = 0;
-  node.body.map(function (child) {
+  let size = compiler.bytes.createU32vPatch();
+  let count = compiler.bytes.createU32vPatch();
+  let amount = 0;
+  node.body.map(child => {
     if (child.kind === Nodes.VariableDeclaration && child.isGlobal) {
-      var init = child.init.right;
+      let init = child.init.right;
       // globals have their own indices, patch it here
       child.index = amount++;
       compiler.bytes.emitU8(getWasmType(child.type));
@@ -1634,20 +1500,20 @@ function emitGlobalSection(node) {
 
 function emitTypeSection(node) {
   compiler.bytes.emitU8(WASM.SECTION_TYPE);
-  var size = compiler.bytes.createU32vPatch();
-  var count = compiler.bytes.createU32vPatch();
-  var amount = 0;
-  node.body.map(function (child) {
+  let size = compiler.bytes.createU32vPatch();
+  let count = compiler.bytes.createU32vPatch();
+  let amount = 0;
+  node.body.map(child => {
     if (child.kind === Nodes.FunctionDeclaration && !child.isPrototype) {
       compiler.bytes.emitU8(WASM.TYPE_CTOR_FUNC);
       // parameter count
       compiler.bytes.writeVarUnsigned(child.parameter.length);
       // parameter types
-      child.parameter.map(function (param) {
+      child.parameter.map(param => {
         compiler.bytes.emitU8(getWasmType(param.type));
       });
       // emit type
-      if (child.type !== TokenList$1.VOID) {
+      if (child.type !== TokenList.VOID) {
         // return count, max 1 in MVP
         compiler.bytes.emitU8(1);
         // return type
@@ -1667,10 +1533,10 @@ function emitTypeSection(node) {
 
 function emitFunctionSection(node) {
   compiler.bytes.emitU8(WASM.SECTION_FUNCTION);
-  var size = compiler.bytes.createU32vPatch();
-  var count = compiler.bytes.createU32vPatch();
-  var amount = 0;
-  node.body.map(function (child) {
+  let size = compiler.bytes.createU32vPatch();
+  let count = compiler.bytes.createU32vPatch();
+  let amount = 0;
+  node.body.map(child => {
     if (child.kind === Nodes.FunctionDeclaration && !child.isPrototype) {
       amount++;
       compiler.bytes.writeVarUnsigned(child.index);
@@ -1683,7 +1549,7 @@ function emitFunctionSection(node) {
 function emitMemorySection(node) {
   compiler.bytes.emitU8(WASM.SECTION_MEMORY);
   // we dont use memory yet, write empty bytes
-  var size = compiler.bytes.createU32vPatch();
+  let size = compiler.bytes.createU32vPatch();
   compiler.bytes.emitU32v(1);
   compiler.bytes.emitU32v(0);
   compiler.bytes.emitU32v(1);
@@ -1692,11 +1558,11 @@ function emitMemorySection(node) {
 
 function emitExportSection(node) {
   compiler.bytes.emitU8(WASM.SECTION_EXPORT);
-  var size = compiler.bytes.createU32vPatch();
-  var count = compiler.bytes.createU32vPatch();
-  var amount = 0;
+  let size = compiler.bytes.createU32vPatch();
+  let count = compiler.bytes.createU32vPatch();
+  let amount = 0;
   // export functions
-  node.body.map(function (child) {
+  node.body.map(child => {
     if (child.kind === Nodes.FunctionDeclaration && !child.isPrototype) {
       if (child.isExported || child.id === "main") {
         amount++;
@@ -1707,7 +1573,7 @@ function emitExportSection(node) {
     }
   });
   // export memory
-  (function () {
+  (() => {
     amount++;
     compiler.bytes.emitString("memory");
     compiler.bytes.emitU8(WASM.EXTERN_MEMORY);
@@ -1719,10 +1585,10 @@ function emitExportSection(node) {
 
 function emitCodeSection(node) {
   compiler.bytes.emitU8(WASM.SECTION_CODE);
-  var size = compiler.bytes.createU32vPatch();
-  var count = compiler.bytes.createU32vPatch();
-  var amount = 0;
-  node.body.map(function (child) {
+  let size = compiler.bytes.createU32vPatch();
+  let count = compiler.bytes.createU32vPatch();
+  let amount = 0;
+  node.body.map(child => {
     if (child.kind === Nodes.FunctionDeclaration && !child.isPrototype) {
       emitFunction(child);
       amount++;
@@ -1737,11 +1603,11 @@ function growHeap(amount) {
 }
 
 function emitNode(node) {
-  var kind = node.kind;
+  let kind = node.kind;
   if (kind === Nodes.BlockStatement) {
-    var actual = node.context.node;
+    let actual = node.context.node;
     // if, while auto provide a block scope
-    var skip = actual.kind === Nodes.IfStatement || actual.kind === Nodes.WhileStatement || actual.kind === Nodes.FunctionDeclaration;
+    let skip = actual.kind === Nodes.IfStatement || actual.kind === Nodes.WhileStatement || actual.kind === Nodes.FunctionDeclaration;
     if (skip) {
       //console.log("Skipping block code for", Nodes[actual.kind]);
     }
@@ -1752,7 +1618,7 @@ function emitNode(node) {
       compiler.bytes.emitU8(WASM.OPCODE_BLOCK);
       compiler.bytes.emitU8(WASM.TYPE_CTOR_BLOCK);
     }
-    node.body.map(function (child) {
+    node.body.map(child => {
       emitNode(child);
     });
     if (!skip) {
@@ -1777,9 +1643,9 @@ function emitNode(node) {
     if (node.argument) emitNode(node.argument);
     compiler.bytes.emitU8(WASM.OPCODE_RETURN);
   } else if (kind === Nodes.CallExpression) {
-    var callee = node.callee.value;
-    var resolve = compiler.scope.resolve(callee);
-    node.parameter.map(function (child) {
+    let callee = node.callee.value;
+    let resolve = compiler.scope.resolve(callee);
+    node.parameter.map(child => {
       emitNode(child);
     });
     if (resolve.isPointer) {
@@ -1814,25 +1680,25 @@ function emitNode(node) {
     compiler.bytes.emitU8(WASM.OPCODE_END);
   } else if (kind === Nodes.BreakStatement) {
     compiler.bytes.emitU8(WASM.OPCODE_BR);
-    var label = getLoopDepthIndex();
+    let label = getLoopDepthIndex();
     compiler.bytes.writeVarUnsigned(label);
     compiler.bytes.emitU8(WASM.OPCODE_UNREACHABLE);
   } else if (kind === Nodes.ContinueStatement) {
     compiler.bytes.emitU8(WASM.OPCODE_BR);
-    var _label = getLoopDepthIndex();
-    compiler.bytes.writeVarUnsigned(_label - 1);
+    let label = getLoopDepthIndex();
+    compiler.bytes.writeVarUnsigned(label - 1);
     compiler.bytes.emitU8(WASM.OPCODE_UNREACHABLE);
   } else if (kind === Nodes.Literal) {
-    if (node.type === Token$1.Identifier) {
+    if (node.type === Token.Identifier) {
       emitIdentifier(node);
-    } else if (node.type === Token$1.NumericLiteral || node.type === Token$1.HexadecimalLiteral) {
+    } else if (node.type === Token.NumericLiteral || node.type === Token.HexadecimalLiteral) {
       compiler.bytes.emitU8(WASM.OPCODE_I32_CONST);
       compiler.bytes.emitLEB128(parseInt(node.value));
     } else {
       compiler.__imports.error("Unknown literal type " + node.type);
     }
   } else if (kind === Nodes.UnaryPrefixExpression) {
-    var operator = node.operator;
+    let operator = node.operator;
     // 0 - x
     if (operator === "-") {
       compiler.bytes.emitUi32(0);
@@ -1846,10 +1712,10 @@ function emitNode(node) {
       emitNode(node.value);
       compiler.bytes.emitU8(WASM.OPCODE_I32_EQZ);
     } else if (operator === "++" || operator === "--") {
-      var local = node.value;
-      var _resolve = compiler.scope.resolve(local.value);
-      var op = node.operator === "++" ? WASM.OPCODE_I32_ADD : WASM.OPCODE_I32_SUB;
-      compiler.bytes.emitUi32(_resolve.offset);
+      let local = node.value;
+      let resolve = compiler.scope.resolve(local.value);
+      let op = node.operator === "++" ? WASM.OPCODE_I32_ADD : WASM.OPCODE_I32_SUB;
+      compiler.bytes.emitUi32(resolve.offset);
       emitNode(local);
       compiler.bytes.emitUi32(1);
       compiler.bytes.emitU8(op);
@@ -1858,7 +1724,7 @@ function emitNode(node) {
       // i32
       compiler.bytes.emitU8(2);
       compiler.bytes.emitU8(0);
-      compiler.bytes.emitUi32(_resolve.offset);
+      compiler.bytes.emitUi32(resolve.offset);
       // tee_local with load
       compiler.bytes.emitLoad32();
     } else if (operator === "&") {
@@ -1869,13 +1735,13 @@ function emitNode(node) {
   } else if (kind === Nodes.UnaryPostfixExpression) {
     emitPostfixExpression(node);
   } else if (kind === Nodes.BinaryExpression) {
-    var _operator = node.operator;
-    if (_operator === "=") {
+    let operator = node.operator;
+    if (operator === "=") {
       emitAssignment(node);
     } else {
       emitNode(node.left);
       emitNode(node.right);
-      compiler.bytes.emitU8(getWasmOperator(_operator));
+      compiler.bytes.emitU8(getWasmOperator(operator));
     }
   } else {
     compiler.__imports.error("Unknown node kind " + kind);
@@ -1892,13 +1758,13 @@ function resolveLValue(node) {
 
 // lvalue á &var &(var)
 function emitReference(node) {
-  var lvalue = resolveLValue(node);
-  var resolve = compiler.scope.resolve(lvalue.value);
+  let lvalue = resolveLValue(node);
+  let resolve = compiler.scope.resolve(lvalue.value);
   // &ptr?
   if (resolve.isPointer) {
-    var value = node.value;
+    let value = node.value;
     // &ptr
-    if (value.type === Token$1.Identifier) {
+    if (value.type === Token.Identifier) {
       compiler.bytes.emitUi32(resolve.offset);
     } else if (value.operator === "*") {
       // &*ptr
@@ -1931,104 +1797,97 @@ function emitPointerAssignment(node) {
   emitNode(node.right);
   // store it
   compiler.bytes.emitU8(WASM.OPCODE_I32_STORE);
-  compiler.bytes.emitU8(2); // i32
+  // i32
+  compiler.bytes.emitU8(2);
   compiler.bytes.emitU8(0);
 }
 
 function emitAssignment(node) {
-  var target = node.left;
+  let target = node.left;
   // special case, pointer assignment
   if (node.left.operator === "*") {
     emitPointerAssignment(node);
     return;
   }
-  var resolve = scope.resolve(node.left.value);
+  let resolve = compiler.scope.resolve(node.left.value);
   // deep assignment
   if (node.right.operator === "=") {
     emitNode(node.right);
     emitNode(node.right.left);
-  }
-  // global variable
-  else if (resolve.isGlobal) {
-      emitNode(node.right);
-      compiler.bytes.emitU8(WASM.OPCODE_SET_GLOBAL);
-      compiler.bytes.writeVarUnsigned(resolve.index);
-    }
+  } else if (resolve.isGlobal) {
+    // global variable
+    emitNode(node.right);
+    compiler.bytes.emitU8(WASM.OPCODE_SET_GLOBAL);
+    compiler.bytes.writeVarUnsigned(resolve.index);
+  } else if (resolve.isAlias) {
     // assign to alias variable
-    else if (resolve.isAlias) {
-        // *ptr | b
-        // =
-        // node
-        emitNode({
-          kind: Nodes.BinaryExpression,
-          operator: "=",
-          left: resolve.aliasValue,
-          right: node.right
-        });
-      }
-      // assign to default parameter
-      else if (resolve.isParameter && !resolve.isPointer) {
-          emitNode(node.right);
-          compiler.bytes.emitU8(WASM.OPCODE_SET_LOCAL);
-          compiler.bytes.writeVarUnsigned(resolve.index);
-        }
-        // assign to default variable
-        else {
-            if (insideVariableDeclaration) {
-              emitNode(node.right);
-            } else {
-              compiler.bytes.emitUi32(resolve.offset);
-              emitNode(node.right);
-              compiler.bytes.emitU8(WASM.OPCODE_I32_STORE);
-              compiler.bytes.emitU8(2); // i32
-              compiler.bytes.writeVarUnsigned(0);
-            }
-          }
+    // *ptr | b
+    // =
+    // node
+    emitNode({
+      kind: Nodes.BinaryExpression,
+      operator: "=",
+      left: resolve.aliasValue,
+      right: node.right
+    });
+  } else if (resolve.isParameter && !resolve.isPointer) {
+    // assign to default parameter
+    emitNode(node.right);
+    compiler.bytes.emitU8(WASM.OPCODE_SET_LOCAL);
+    compiler.bytes.writeVarUnsigned(resolve.index);
+  } else {
+    // assign to default variable
+    if (insideVariableDeclaration) {
+      emitNode(node.right);
+    } else {
+      compiler.bytes.emitUi32(resolve.offset);
+      emitNode(node.right);
+      compiler.bytes.emitU8(WASM.OPCODE_I32_STORE);
+      // i32
+      compiler.bytes.emitU8(2);
+      compiler.bytes.writeVarUnsigned(0);
+    }
+  }
 }
 
 function emitIdentifier(node) {
-  var resolve = scope.resolve(node.value);
+  let resolve = compiler.scope.resolve(node.value);
   // global variable
   if (resolve.isGlobal) {
     compiler.bytes.emitU8(WASM.OPCODE_GET_GLOBAL);
     compiler.bytes.writeVarUnsigned(resolve.index);
-  }
-  // we only have access to the passed in value
-  else if (resolve.isParameter) {
-      compiler.bytes.emitU8(WASM.OPCODE_GET_LOCAL);
-      compiler.bytes.writeVarUnsigned(resolve.index);
-    }
+  } else if (resolve.isParameter) {
+    // we only have access to the passed in value
+    compiler.bytes.emitU8(WASM.OPCODE_GET_LOCAL);
+    compiler.bytes.writeVarUnsigned(resolve.index);
+  } else if (resolve.isPointer) {
     // pointer variable
-    else if (resolve.isPointer) {
-        // push the pointer's pointed to address
-        compiler.bytes.emitUi32(resolve.offset);
-        compiler.bytes.emitLoad32();
-      }
-      // just a shortcut to the assigned value
-      else if (resolve.isAlias) {
-          emitNode(resolve.aliasValue);
-        }
-        // return the function's address
-        else if (resolve.kind === Nodes.FunctionDeclaration) {
-            compiler.bytes.emitUi32(resolve.index);
-          }
-          // default variable
-          else if (resolve.kind === Nodes.VariableDeclaration) {
-              // variables are stored in memory too
-              compiler.bytes.emitUi32(resolve.offset);
-              compiler.bytes.emitLoad32();
-            } else {
-              __imports.error("Unknown identifier kind", getLabelName(resolve.kind));
-            }
+    // push the pointer's pointed to address
+    compiler.bytes.emitUi32(resolve.offset);
+    compiler.bytes.emitLoad32();
+  } else if (resolve.isAlias) {
+    // just a shortcut to the assigned value
+    emitNode(resolve.aliasValue);
+  } else if (resolve.kind === Nodes.FunctionDeclaration) {
+    // return the function's address
+    compiler.bytes.emitUi32(resolve.index);
+  } else if (resolve.kind === Nodes.VariableDeclaration) {
+    // default variable
+    // variables are stored in memory too
+    compiler.bytes.emitUi32(resolve.offset);
+    compiler.bytes.emitLoad32();
+  } else {
+    compiler.__imports.error("Unknown identifier kind", getLabelName(resolve.kind));
+  }
 }
 
-var insideVariableDeclaration = false;
+let insideVariableDeclaration = false;
 function emitVariableDeclaration(node) {
-  var resolve = scope.resolve(node.id);
+  let resolve = compiler.scope.resolve(node.id);
   node.offset = compiler.currentHeapOffset;
   // store pointer
   if (resolve.isPointer) {
-    __imports.log("Store variable", node.id, "in memory at", resolve.offset);
+    compiler.__imports.log("Store variable", node.id, "in memory at", resolve.offset);
     // # store the pointed adress
     // offset
     compiler.bytes.emitUi32(resolve.offset);
@@ -2039,42 +1898,43 @@ function emitVariableDeclaration(node) {
     insideVariableDeclaration = false;
     // store
     compiler.bytes.emitU8(WASM.OPCODE_I32_STORE);
-    compiler.bytes.emitU8(2); // i32
+    // i32
+    compiler.bytes.emitU8(2);
+    compiler.bytes.emitU8(0);
+  } else if (resolve.isAlias) {
+    // store alias
+    compiler.__imports.log("Store alias", node.id, "in memory at", resolve.offset);
+    // offset
+    compiler.bytes.emitUi32(resolve.offset);
+    growHeap(4);
+    // alias = &(init)
+    emitNode(node.aliasReference);
+    // store
+    compiler.bytes.emitU8(WASM.OPCODE_I32_STORE);
+    // i32
+    compiler.bytes.emitU8(2);
+    compiler.bytes.emitU8(0);
+  } else {
+    // store variable
+    compiler.__imports.log("Store variable", node.id, "in memory at", resolve.offset);
+    // offset
+    compiler.bytes.emitUi32(resolve.offset);
+    growHeap(4);
+    // value
+    insideVariableDeclaration = true;
+    emitNode(node.init);
+    insideVariableDeclaration = false;
+    // store
+    compiler.bytes.emitU8(WASM.OPCODE_I32_STORE);
+    // i32
+    compiler.bytes.emitU8(2);
     compiler.bytes.emitU8(0);
   }
-  // store alias
-  else if (resolve.isAlias) {
-      __imports.log("Store alias", node.id, "in memory at", resolve.offset);
-      // offset
-      compiler.bytes.emitUi32(resolve.offset);
-      growHeap(4);
-      // alias = &(init)
-      emitNode(node.aliasReference);
-      // store
-      compiler.bytes.emitU8(WASM.OPCODE_I32_STORE);
-      compiler.bytes.emitU8(2); // i32
-      compiler.bytes.emitU8(0);
-    }
-    // store variable
-    else {
-        __imports.log("Store variable", node.id, "in memory at", resolve.offset);
-        // offset
-        compiler.bytes.emitUi32(resolve.offset);
-        growHeap(4);
-        // value
-        insideVariableDeclaration = true;
-        emitNode(node.init);
-        insideVariableDeclaration = false;
-        // store
-        compiler.bytes.emitU8(WASM.OPCODE_I32_STORE);
-        compiler.bytes.emitU8(2); // i32
-        compiler.bytes.emitU8(0);
-      }
 }
 
 function getLoopDepthIndex() {
-  var ctx = scope;
-  var label = 0;
+  let ctx = compiler.scope;
+  let label = 0;
   while (ctx !== null) {
     label++;
     if (ctx.node.kind === Nodes.WhileStatement) break;
@@ -2084,8 +1944,8 @@ function getLoopDepthIndex() {
 }
 
 function emitPostfixExpression(node) {
-  var local = node.value;
-  var resolve = scope.resolve(local.value);
+  let local = node.value;
+  let resolve = compiler.scope.resolve(local.value);
   if (node.operator === "++") {
     // store offset
     compiler.bytes.emitUi32(resolve.offset);
@@ -2095,7 +1955,8 @@ function emitPostfixExpression(node) {
     compiler.bytes.emitU8(WASM.OPCODE_I32_ADD);
     // pop store
     compiler.bytes.emitU8(WASM.OPCODE_I32_STORE);
-    compiler.bytes.emitU8(2); // i32
+    // i32
+    compiler.bytes.emitU8(2);
     compiler.bytes.emitU8(0);
     compiler.bytes.emitUi32(resolve.offset);
     // tee_local with load
@@ -2110,7 +1971,8 @@ function emitPostfixExpression(node) {
     compiler.bytes.emitU8(WASM.OPCODE_I32_SUB);
     // pop store
     compiler.bytes.emitU8(WASM.OPCODE_I32_STORE);
-    compiler.bytes.emitU8(2); // i32
+    // i32
+    compiler.bytes.emitU8(2);
     compiler.bytes.emitU8(0);
     compiler.bytes.emitUi32(resolve.offset);
     // tee_local with load
@@ -2121,13 +1983,13 @@ function emitPostfixExpression(node) {
 }
 
 function emitFunction(node) {
-  var size = compiler.bytes.createU32vPatch();
+  let size = compiler.bytes.createU32vPatch();
   // emit count of locals
-  var locals = node.locals;
+  let locals = node.locals;
   // local count
   compiler.bytes.writeVarUnsigned(locals.length);
   // local entry signatures
-  locals.map(function (local) {
+  locals.map(local => {
     compiler.bytes.emitU8(1);
     compiler.bytes.emitU8(getWasmType(local.type));
   });
@@ -2138,7 +2000,7 @@ function emitFunction(node) {
 }
 
 function hexDump(array) {
-  var result = Array.from(array).map(function (v) {
+  let result = Array.from(array).map(v => {
     return v.toString(16);
   });
   return result;
@@ -2148,21 +2010,21 @@ function hexDump(array) {
 
 
 
-function compile(str, imports, sync) {
+function compile(str, imports = { log: console.log }, sync) {
   // reset
   compiler.reset(imports);
 
   // process
-  var tkns = scan(str);
-  var ast = parse(tkns);
+  let tkns = scan(str);
+  let ast = parse(tkns);
   emit(ast);
-  var buffer = new Uint8Array(compiler.bytes);
-  var dump = hexDump(buffer);
+  let buffer = new Uint8Array(compiler.bytes);
+  let dump = hexDump(buffer);
 
   // output
   if (sync === true) {
-    var _module = new WebAssembly.Module(buffer);
-    var instance = new WebAssembly.Instance(_module);
+    let module = new WebAssembly.Module(buffer);
+    let instance = new WebAssembly.Instance(module);
     return {
       ast: ast,
       dump: dump,
@@ -2172,9 +2034,9 @@ function compile(str, imports, sync) {
       exports: instance.exports
     };
   }
-  return new Promise(function (resolve, reject) {
-    WebAssembly.instantiate(buffer).then(function (result) {
-      var instance = result.instance;
+  return new Promise((resolve, reject) => {
+    WebAssembly.instantiate(buffer).then(result => {
+      let instance = result.instance;
       resolve({
         ast: ast,
         dump: dump,

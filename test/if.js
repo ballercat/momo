@@ -1,5 +1,7 @@
 import test from 'ava';
 
+test.todo('if');
+
 const tests = [
   ` int main() {
     int a = 5;
@@ -40,5 +42,4 @@ const tests = [
   };`,
   `198`
 ];
-test(t => {});
 

@@ -1,6 +1,6 @@
 import test from 'ava';
 
-const tests = [
+test.todo('prototype', [
  `int fact();
   int lol(int a, int b);
   extern int main() {
@@ -15,6 +15,5 @@ const tests = [
   };
   `,
   `14`
-];
-test(t => {});
+]);
 

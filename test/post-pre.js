@@ -1,6 +1,6 @@
 import test from 'ava';
 
-const tests = [
+test.todo('post-pre', [
   `int main() {
     int a = -10;
     return (-(++a + -30 - -10) * -8);
@@ -81,6 +81,5 @@ const tests = [
     return (k);
   };`,
   `1`
-];
-test(t => {});
+]);
 

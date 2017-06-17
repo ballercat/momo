@@ -33,7 +33,7 @@ function loadStdlib() {
   });
 };
 
-function compile(str, imports, sync) {
+function compile(str, imports = { log: console.log }, sync) {
   // reset
   compiler.reset(imports);
 

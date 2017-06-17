@@ -1,6 +1,6 @@
 import test from 'ava';
 
-const tests = [
+test.todo('pass-by-val', [
   `int test(int h) {
     h++;
     h += 1;
@@ -13,6 +13,5 @@ const tests = [
   };
   `,
   `123`
-];
-test('pass-by-val', t => {});
+]);
 

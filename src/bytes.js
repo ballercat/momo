@@ -173,3 +173,4 @@ export default class ByteArray extends Array {
     };
   }
 };
+
