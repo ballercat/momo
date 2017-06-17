@@ -47,12 +47,6 @@ npm install
 npm test
 ```
 
-... or watch changes with `--watch`
-
-```
-npm test -- --watch
-```
-
 ### Contribution:
  - Feel free to send any kind of pull request
 
