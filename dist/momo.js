@@ -2257,18 +2257,28 @@ function memoryDump(array, limit) {
 
 
 const defaultImports = {
-  log: console.log
+  log: console.log,
+  error: console.error
 };
 
-function compile(str, imports = {}, sync) {
+function compileSource(source, imports) {
   // reset
   compiler.reset(Object.assign({}, defaultImports, imports));
 
   // process
-  let tkns = scan(str);
+  let tkns = scan(source);
   let ast = parse(tkns);
   emit(ast);
-  let buffer = new Uint8Array(compiler.bytes);
+
+  return {
+    buffer: new Uint8Array(compiler.bytes),
+    ast,
+    tokens: tkns
+  };
+}
+
+function compile(str, imports = {}, sync) {
+  const { buffer, ast } = compileSource(str, imports);
   let dump = hexDump(buffer);
 
   // output
@@ -2299,6 +2309,8 @@ function compile(str, imports = {}, sync) {
   });
 }
 
+// Export internal functions
+compile.compileSource = compileSource;
 compile.scan = scan;
 compile.parse = parse;
 compile.emit = emit;
