@@ -2299,6 +2299,10 @@ function compile(str, imports = {}, sync) {
   });
 }
 
+compile.scan = scan;
+compile.parse = parse;
+compile.emit = emit;
+
 if (typeof window !== "undefined") {
   window.compile = compile;
   window.memoryDump = memoryDump;

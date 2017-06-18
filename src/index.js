@@ -76,6 +76,11 @@ export default function compile(str, imports = {}, sync) {
   });
 };
 
+// Export internal functions
+compile.scan = scan;
+compile.parse = parse;
+compile.emit = emit;
+
 if (typeof window !== "undefined") {
   window.compile = compile;
   window.memoryDump = memoryDump;
