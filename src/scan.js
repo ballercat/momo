@@ -1,6 +1,15 @@
 "use strict";
 import { Token, TokenList, Operators } from "./const";
 
+const BLANK = 0;
+const QUOTE = 1;
+const ALPHA = 2;
+const NUMBER = 3;
+const HEX = 4;
+const PUNCTUATOR = 5;
+const OPERATOR = 6;
+const EOL = 7;
+
 function isBlank(cc) {
   return (
     cc === 9 ||
@@ -97,6 +106,19 @@ function isOperator(str) {
   );
 };
 
+const isEOL = (cc) => cc === 10;
+
+const getType = (ch, cc) => {
+  return (isBlank(cc) && BLANK) ||
+         (isEOL(cc) && EOL) ||
+         (isQuote(cc) && QUOTE) ||
+         (isAlpha(cc) && ALPHA) ||
+         (isNumber(cc) && NUMBER) ||
+         (isHex(cc) && HEX) ||
+         (isPunctuatorChar(ch) && PUNCTUATOR) ||
+         (isOperator(ch) && OPERATOR);
+};
+
 function processToken(tokens, value, line, column) {
   let kind = Token.UNKNOWN;
   if (TokenList[value] >= 0) kind = TokenList[value];
@@ -124,6 +146,7 @@ export default function scan(str) {
   let column = 0;
   let length = str.length;
   let tokens = [];
+  let type = null;
 
   function next(amount = 1) {
     ii += amount;
@@ -144,98 +167,99 @@ export default function scan(str) {
     }
   };
 
-  while (true) {
+  function processAlpha(cc, start, str) {
+    while (true) {
+      if (!isAlpha(cc) && !isNumber(cc)) {
+        ii--;
+        column--;
+        break;
+      }
+      next();
+      cc = str.charCodeAt(ii);
+    };
+    let content = str.slice(start, ii+1);
+    processToken(tokens, content, line, column);
+  }
+
+  while (ii < length) {
     next();
     let ch = str.charAt(ii);
     let cc = str.charCodeAt(ii);
-    // blank [/s,/n]
-    if (isBlank(cc)) {
-      continue;
-    }
-    if (cc === 10) {
-      line++;
-      column = 0;
-      continue;
-    }
-    // alphabetical [aA-zZ]
-    if (isAlpha(cc)) {
-      let start = ii;
-      while (true) {
-        if (!isAlpha(cc) && !isNumber(cc)) {
-          ii--;
-          column--;
-          break;
-        }
-        next();
-        cc = str.charCodeAt(ii);
-      };
-      let content = str.slice(start, ii+1);
-      processToken(tokens, content, line, column);
-      continue;
-    }
-    // number [0-9,-0]
-    if (isNumber(cc)) {
-      // hexadecimal
-      if (str.charAt(ii+1) === "x") {
-        let start = ii;
-        next();
-        while (true) {
-          if (!isHex(cc)) {
-            ii--;
-            column--;
-            break;
+    type = getType(ch, cc);
+
+    switch(type) {
+      case EOL:
+        line++;
+        column = 0;
+      // blank [/s,/n]
+      case BLANK:
+        break;
+      case ALPHA:
+        // alphabetical [aA-zZ]
+        processAlpha(cc, ii, str);
+        break;
+      case NUMBER:
+        // number [0-9,-0]
+        {
+          // hexadecimal
+          if (str.charAt(ii+1) === "x") {
+            let start = ii;
+            next();
+            while (true) {
+              if (!isHex(cc)) {
+                ii--;
+                column--;
+                break;
+              }
+              next();
+              cc = str.charCodeAt(ii);
+            };
+            let content = str.slice(start, ii+1);
+            let token = createToken(Token.HexadecimalLiteral, content, line, column);
+            tokens.push(token);
+            continue;
           }
-          next();
-          cc = str.charCodeAt(ii);
-        };
-        let content = str.slice(start, ii+1);
-        let token = createToken(Token.HexadecimalLiteral, content, line, column);
-        tokens.push(token);
-        continue;
-      }
-      let start = ii;
-      while (true) {
-        if (!isNumber(cc) && cc !== 45) {
-          ii--;
-          column--;
-          break;
+          let start = ii;
+          while (true) {
+            if (!isNumber(cc) && cc !== 45) {
+              ii--;
+              column--;
+              break;
+            }
+            next();
+            cc = str.charCodeAt(ii);
+          };
+          let content = str.slice(start, ii+1);
+          let token = createToken(Token.NumericLiteral, content, line, column);
+          tokens.push(token);
+          continue;
         }
-        next();
-        cc = str.charCodeAt(ii);
-      };
-      let content = str.slice(start, ii+1);
-      let token = createToken(Token.NumericLiteral, content, line, column);
-      tokens.push(token);
-      continue;
-    }
-    // comment [//]
-    if (ch === "/" && str[ii + 1] === "/") {
-      // TODO: add support for /* */
-      while (true) {
-        if (cc === 10) {
-          column = 0;
-          line++;
-          break;
+      // punctuator [;,(,)]
+      case PUNCTUATOR:
+        {
+          let content = str.slice(ii, ii+1);
+          processToken(tokens, content, line, column);
+          continue;
         }
-        next();
-        cc = str.charCodeAt(ii);
-      };
-      continue;
-    }
-    // punctuator [;,(,)]
-    if (isPunctuatorChar(ch)) {
-      let content = str.slice(ii, ii+1);
-      processToken(tokens, content, line, column);
-      continue;
-    }
-    // single operator [+,-,=]
-    if (isOperatorChar(ch)) {
-      processOperator(ch, ii, line, column);
-      continue;
-    }
-    if (ii >= length) {
-      break;
+      case OPERATOR:
+        processOperator(ch, ii, line, column);
+        break;
+      default:
+        // comment [//]
+        if (ch === "/" && str[ii + 1] === "/") {
+          // TODO: add support for /* */
+          while (true) {
+            if (cc === 10) {
+              column = 0;
+              line++;
+              break;
+            }
+            next();
+            cc = str.charCodeAt(ii);
+          };
+        }
     }
   };
-  return (tokens);
+
+  return tokens;
 };
