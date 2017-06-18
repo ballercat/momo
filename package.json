@@ -7,8 +7,7 @@
     "test": "test"
   },
   "scripts": {
-    "test": "npm run build && npm run ava",
-    "ava": "ava || true",
+    "test": "ava",
     "build": "echo \"Building...\" && rollup -c"
   },
   "repository": {
@@ -29,6 +28,7 @@
   "devDependencies": {
     "ava": "^0.19.1",
     "babel-plugin-external-helpers": "^6.22.0",
+    "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-env": "^1.5.2",
     "babel-preset-es2015": "^6.24.1",
     "rollup": "^0.43.0",
@@ -36,6 +36,7 @@
     "rollup-plugin-commonjs": "^8.0.2",
     "rollup-plugin-eslint": "^3.0.0",
     "rollup-plugin-uglify": "^2.0.1",
+    "snap-shot": "^2.17.0",
     "uglify-es": "^3.0.17"
   },
   "ava": {
@@ -44,8 +45,8 @@
       "!**/utils.js"
     ],
     "source": [
-      "**/*.{js",
-      "!dist/**/*"
+      "src/*.js",
+      "test/*.js"
     ],
     "concurrency": 5,
     "failFast": true,
@@ -55,10 +56,7 @@
     "require": [
       "babel-register"
     ],
-    "babel": {
-      "presets": [
-        "es2015"
-      ]
-    }
-  }
+    "babel": "inherit"
+  },
+  "dependencies": {}
 }

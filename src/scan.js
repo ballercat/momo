@@ -125,26 +125,22 @@ export default function scan(str) {
   let length = str.length;
   let tokens = [];
 
-  function next() {
-    ii++;
-    column++;
+  function next(amount = 1) {
+    ii += amount;
+    column += amount;
   };
 
   // placed here to have correct context to next()
   function processOperator(ch, idx, line, column) {
-    let second = str.slice(idx + 1, idx + 2);
-    let third = str.slice(idx + 2, idx + 3);
-    if (second && isOperator(ch + second)) {
-      if (third && isOperator(ch + second + third)) {
-        next();
-        next();
-        processToken(tokens, ch + second + third, line, column);
-      } else {
-        next();
-        processToken(tokens, ch + second, line, column);
-      }
-    } else if (isOperator(ch)) {
-      processToken(tokens, ch, line, column);
+    let second = ch + str.charAt(idx + 1);
+    let third = second + str.charAt(idx + 2);
+    const operator = (isOperator(third) && third) ||
+                     (isOperator(second) && second) ||
+                     (isOperator(ch) && ch);
+
+    if (operator) {
+      next(operator.length);
+      processToken(tokens, operator, line, column);
     }
   };
 

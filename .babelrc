@@ -1,12 +1,14 @@
 {
-  presets: [
+  "presets": [
     [
       "env", {
       "targets": {
         "chrome": "60.0.0"
-      },
-      "modules": false
+      }
     }]
+  ],
+  "plugins": [
+     "transform-runtime"
   ]
 }
 
