@@ -1,7 +1,7 @@
 "use strict";
-import { $INCONSTANT_GLOBAL_INITIALIZERS } from './config';
-import compiler from './compiler';
-import { TokenList, Token, Nodes, WASM, getLabelName } from './const';
+import { $INCONSTANT_GLOBAL_INITIALIZERS } from "./config";
+import compiler from "./compiler";
+import { TokenList, Token, Nodes, WASM, getLabelName } from "./const";
 
 function getWasmType(type) {
   switch (type) {

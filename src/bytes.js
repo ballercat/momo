@@ -1,5 +1,5 @@
 "use strict";
-import { WASM } from './const';
+import { WASM } from "./const";
 
 export default class ByteArray extends Array {
   emitU8(value) {

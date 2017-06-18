@@ -1,7 +1,7 @@
-import test from 'ava';
-import runTest from './utils';
-import tests from '../test/main';
+import test from "ava";
+import runTest from "./utils";
+import tests from "../test/main";
 
-test('if', t => runTest(t, tests));
+test("if", t => runTest(t, tests));
 
 

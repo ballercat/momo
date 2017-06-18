@@ -1,6 +1,6 @@
-import test from 'ava';
-import runTest from './utils';
-import tests from '../test/global';
+import test from "ava";
+import runTest from "./utils";
+import tests from "../test/global";
 
-test('global', t => runTest(t, tests));
+test("global", t => runTest(t, tests));
 
