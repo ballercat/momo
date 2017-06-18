@@ -13,7 +13,7 @@ module.exports = (t, tests) => {
   .then(wasms => wasms.map(({ instance: { exports } }, i) => {
       // TODO: This works for now... but will be problematic with floats
       const number = !isNaN(parseInt(results[i])) ? parseInt(results[i]) : null;
-      t.is(exports.main(), number | results[i], `Check ${i} failed`);
+      t.is(exports.main(), number | results[i], tests[i * 2]);
     })
   );
 };
