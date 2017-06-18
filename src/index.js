@@ -33,9 +33,13 @@ function loadStdlib() {
   });
 };
 
-export default function compile(str, imports = { log: console.log }, sync) {
+const defaultImports = {
+  log: console.log
+};
+
+export default function compile(str, imports = {}, sync) {
   // reset
-  compiler.reset(imports);
+  compiler.reset(Object.assign({}, defaultImports, imports));
 
   // process
   let tkns = scan(str);
@@ -71,4 +75,9 @@ export default function compile(str, imports = { log: console.log }, sync) {
     });
   });
 };
+
+if (typeof window !== 'undefined') {
+  window.compile = compile;
+  window.memoryDump = memoryDump;
+}
 
