@@ -1,52 +1,19 @@
-# <img width="42%" src="http://i.imgur.com/lJGRXvt.png" />
-[Just let me play with him](http://maierfelix.github.io/momo/)
-
 ### Description:
-This is an experimental C compiler which compiles into WebAssembly. It's currently written in plain JavaScript but will be rewritten in C (and get self-hosted) as soon as the compiler has enough features to do so.
+This is a fork of [momo](https://github.com/maierfelix/momo). Implementing a different sytnax, aiming to be much
+closer to javascript.
 
 ### Syntax:
 
-````c
-int fact(i32 n) {
+```javascript
+function fact(n: i32) : i32 {
   if (n == 0) {
     return 1;
   }
   return (n * fact(n - 1));
 };
-extern int main(int a, int b) {
+export function main(a: i32, b: i32) : i32 {
   return (fact(a + b));
 };
-````
-
-### Pipeline:
- - **Scanner**: Creates a token array out of the input
- - **Parser**: Eats tokens and generates an AST out of them
- - **Emitter**: Recursively walks the AST (*Luke ASTwalker*) and clumps together a uint8 array which gets passed over into WebAssembly
-
-### API:
-
-#### Compiling a source file:
-````js
-compile(src: String, imports: Object, sync: Boolean)
-````
-````js
-compile(`
-  int main(int a, int b) {
-    return (a + b);
-  };
-`, {}, false);
-````
-
-### Testing
-
-You can run the unit tests through [ava](https://github.com/avajs/ava). Just clone the repo and use pre-built npm commands
-```
-git clone https://github.com/maierfelix/momo.git
-cd momo
-npm install
-npm test
 ```
 
-### Contribution:
- - Feel free to send any kind of pull request
 
