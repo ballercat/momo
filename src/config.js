@@ -1,3 +1,3 @@
 "use strict";
 
-const $INCONSTANT_GLOBAL_INITIALIZERS = false;
+export const $INCONSTANT_GLOBAL_INITIALIZERS = false;

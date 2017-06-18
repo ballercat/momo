@@ -36,6 +36,17 @@ compile(`
   };
 `, {}, false);
 ````
- 
+
+### Testing
+
+You can run the unit tests through [ava](https://github.com/avajs/ava). Just clone the repo and use pre-built npm commands
+```
+git clone https://github.com/maierfelix/momo.git
+cd momo
+npm install
+npm test
+```
+
 ### Contribution:
  - Feel free to send any kind of pull request
+

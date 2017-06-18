@@ -1,7 +1,9 @@
 "use strict";
+import compiler from './compiler';
+import { Nodes } from './const';
 
 // # Scope #
-function Scope() {
+export default function Scope() {
   this.node = null;
   this.index = 0;
   this.parent = null;
@@ -16,7 +18,7 @@ function Scope() {
       if (this.parent) {
         return (this.parent.resolve(id));
       } else {
-        __imports.error(id + " is not defined");
+        compiler.__imports.error(id + " is not defined");
       }
     }
     return (null);
@@ -27,7 +29,7 @@ function Scope() {
       return;
     }
     if (this.symbols[id] !== void 0) {
-      __imports.error("Symbol " + id + " is already defined");
+      compiler.__imports.error("Symbol " + id + " is already defined");
     }
     this.symbols[id] = node;
     // append local index for non-global variables
@@ -44,18 +46,18 @@ function Scope() {
     // function already defined, overwrite if prototype
     if (resolve) {
       if (resolve.type !== node.type) {
-        __imports.error(`Conflicting types for '${id}'`);
+        compiler.__imports.error(`Conflicting types for '${id}'`);
       }
       // TODO: validate parameter types
       if (!resolve.isPrototype && !node.isPrototype) {
-        __imports.error(`Redefinition of '${id}'`);
+        compiler.__imports.error(`Redefinition of '${id}'`);
       }
     }
     this.symbols[id] = node;
   };
 };
 
-function lookupFunctionScope(scope) {
+export function lookupFunctionScope(scope) {
   let ctx = scope;
   while (ctx !== null) {
     if (ctx.node.kind === Nodes.FunctionDeclaration) break;
@@ -64,28 +66,28 @@ function lookupFunctionScope(scope) {
   return (ctx);
 };
 
-function pushScope(node) {
+export function pushScope(node) {
   let scp = new Scope();
   scp.node = node;
-  scp.parent = scope;
-  scp.index = scope ? scope.index + 1 : 0;
+  scp.parent = compiler.scope;
+  scp.index = compiler.scope ? compiler.scope.index + 1 : 0;
   node.context = scp;
-  scope = scp;
+  compiler.scope = scp;
 };
 
-function popScope() {
-  if (scope !== null) {
-    scope = scope.parent;
+export function popScope() {
+  if (compiler.scope !== null) {
+    compiler.scope = compiler.scope.parent;
   }
 };
 
-function expectScope(node, kind) {
-  let item = scope;
+export function expectScope(node, kind) {
+  let item = compiler.scope;
   while (item !== null) {
     if (item && item.node.kind === kind) break;
     item = item.parent;
   };
   if (item === null && kind !== null) {
-    __imports.error("Invalid scope of node " +  node.kind + ", expected", kind);
+    compiler.__imports.error("Invalid scope of node " +  node.kind + ", expected", kind);
   }
 };
