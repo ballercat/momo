@@ -41,11 +41,11 @@
   },
   "ava": {
     "files": [
-      "spec/*.js",
+      "spec/**/*.js",
       "!**/utils.js"
     ],
     "source": [
-      "src/*.js",
+      "src/**/*.js",
       "test/*.js"
     ],
     "concurrency": 5,

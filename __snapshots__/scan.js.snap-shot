@@ -1,30 +1,30 @@
 exports['scanner generates correct  1'] = [
   {
-    "kind": 56,
+    "kind": 61,
     "value": "int",
     "line": 1,
     "column": 0
   },
   {
-    "kind": 31,
+    "kind": 36,
     "value": "x",
     "line": 1,
     "column": 4
   },
   {
-    "kind": 66,
+    "kind": 71,
     "value": "=",
     "line": 1,
-    "column": 6
+    "column": 7
   },
   {
-    "kind": 35,
+    "kind": 40,
     "value": "0",
     "line": 1,
     "column": 9
   },
   {
-    "kind": 42,
+    "kind": 47,
     "value": ";",
     "line": 1,
     "column": 9

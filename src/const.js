@@ -42,6 +42,11 @@ export let Operators = {};
 /** Data types */
 ((Label) => {
   Label[Label["EOF"] = ++ii] = "EOF";
+  Label[Label["EOL"] = ++ii] = "EOL";
+  Label[Label["Whitespace"] = ++ii] = "WHITESPACE";
+  Label[Label["Punctuator"] = ++ii] = "PUNCTUATOR";
+  Label[Label["Operator"] = ++ii] = "OPERATOR";
+  Label[Label["Quote"] = ++ii] = "QUOTE";
   Label[Label["Unknown"] = ++ii] = "Unknown";
   Label[Label["Keyword"] = ++ii] = "Keyword";
   Label[Label["Identifier"] = ++ii] = "Identifier";
