@@ -2240,13 +2240,29 @@ function hexDump(array) {
   return result;
 }
 
+function memoryDump(array, limit) {
+  let str = "";
+  for (let ii = 0; ii < limit; ii += 4) {
+    str += ii;
+    str += ": ";
+    str += array[ii + 0] + ", ";
+    str += array[ii + 1] + ", ";
+    str += array[ii + 2] + ", ";
+    str += array[ii + 3] + " ";
+    str += "\n";
+  }
+  return str;
+}
 
 
 
+const defaultImports = {
+  log: console.log
+};
 
-function compile(str, imports = { log: console.log }, sync) {
+function compile(str, imports = {}, sync) {
   // reset
-  compiler.reset(imports);
+  compiler.reset(Object.assign({}, defaultImports, imports));
 
   // process
   let tkns = scan(str);
@@ -2281,6 +2297,11 @@ function compile(str, imports = { log: console.log }, sync) {
       });
     });
   });
+}
+
+if (typeof window !== 'undefined') {
+  window.compile = compile;
+  window.memoryDump = memoryDump;
 }
 
 return compile;
