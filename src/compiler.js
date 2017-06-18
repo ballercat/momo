@@ -1,4 +1,4 @@
-import ByteArray from './bytes';
+import ByteArray from "./bytes";
 
 class Compiler {
   constructor(imports = null) {

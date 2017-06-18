@@ -1,6 +1,6 @@
-import test from 'ava';
-import runTest from './utils';
-import tests from '../test/enum';
+import test from "ava";
+import runTest from "./utils";
+import tests from "../test/enum";
 
-test('enum', t => runTest(t, tests));
+test("enum", t => runTest(t, tests));
 

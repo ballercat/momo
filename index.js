@@ -1,2 +1,2 @@
-module.exports = require('./dist/momo.js');
+module.exports = require("./dist/momo.js");
 

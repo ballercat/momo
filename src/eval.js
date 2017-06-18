@@ -1,5 +1,5 @@
-import { Token, Nodes, TokenList, Operators, getLabelName } from './const';
-import compiler from './compiler';
+import { Token, Nodes, TokenList, Operators, getLabelName } from "./const";
+import compiler from "./compiler";
 
 export function evalExpression(node) {
   let kind = node.kind;

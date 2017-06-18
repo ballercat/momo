@@ -1,8 +1,8 @@
 "use strict";
-import parse from './parse';
-import scan from './scan';
-import { emit } from './emit';
-import compiler from './compiler';
+import parse from "./parse";
+import scan from "./scan";
+import { emit } from "./emit";
+import compiler from "./compiler";
 
 function hexDump(array) {
   let result = Array.from(array).map((v) => {
@@ -76,7 +76,7 @@ export default function compile(str, imports = {}, sync) {
   });
 };
 
-if (typeof window !== 'undefined') {
+if (typeof window !== "undefined") {
   window.compile = compile;
   window.memoryDump = memoryDump;
 }

@@ -1,5 +1,5 @@
 "use strict";
-import { Token, TokenList, Operators } from './const';
+import { Token, TokenList, Operators } from "./const";
 
 function isBlank(cc) {
   return (

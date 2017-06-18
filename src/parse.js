@@ -1,8 +1,8 @@
 "use strict";
-import { Token, Nodes, TokenList, Operators, getLabelName } from './const';
-import { pushScope, popScope, expectScope, lookupFunctionScope } from './scope';
-import { evalExpression } from './eval';
-import compiler from './compiler';
+import { Token, Nodes, TokenList, Operators, getLabelName } from "./const";
+import { pushScope, popScope, expectScope, lookupFunctionScope } from "./scope";
+import { evalExpression } from "./eval";
+import compiler from "./compiler";
 
 function isBinaryOperator(token) {
   let kind = token.kind;

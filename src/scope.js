@@ -1,6 +1,6 @@
 "use strict";
-import compiler from './compiler';
-import { Nodes } from './const';
+import compiler from "./compiler";
+import { Nodes } from "./const";
 
 // # Scope #
 export default function Scope() {

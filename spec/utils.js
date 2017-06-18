@@ -1,4 +1,4 @@
-const compile = require('../dist/momo');
+const compile = require("../dist/momo");
 
 const compileWithoutLog = code => compile(code, { log: () => null });
 
